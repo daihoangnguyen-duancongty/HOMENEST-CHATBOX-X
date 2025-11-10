@@ -8,9 +8,15 @@ declare global {
   }
 }
 
-// đọc clientId từ global window object
+// 👉 cấu hình clientId và apiEndpoint nếu muốn override
+window.ABC_CHATBOT_WIDGET = window.ABC_CHATBOT_WIDGET || {
+  clientId: 'testclient123', // phải trùng với client trong MongoDB
+  apiEndpoint: 'http://localhost:5000/api/chat'
+};
+
 const widgetConfig = window.ABC_CHATBOT_WIDGET;
-if (!widgetConfig?.clientId) {
+
+if (!widgetConfig.clientId) {
   console.error('Missing clientId for ABC Chatbot Widget');
 } else {
   const root = document.createElement('div');
