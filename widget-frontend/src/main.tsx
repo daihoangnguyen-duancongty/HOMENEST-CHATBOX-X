@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChatWidget } from './components/ChatWidget';
+import { BASE_URL } from './apis/fetcher';
 
 declare global {
   interface Window {
@@ -11,7 +12,7 @@ declare global {
 // 👉 cấu hình clientId và apiEndpoint nếu muốn override
 window.ABC_CHATBOT_WIDGET = window.ABC_CHATBOT_WIDGET || {
   clientId: 'testclient123', // phải trùng với client trong MongoDB
-  apiEndpoint: 'http://localhost:5000/api/chat'
+  apiEndpoint: BASE_URL
 };
 
 const widgetConfig = window.ABC_CHATBOT_WIDGET;

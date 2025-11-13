@@ -5,15 +5,39 @@ import dotenv from 'dotenv';
 
 import chatRoutes from './routes/ChatRoutes';
 import adminRoutes from './routes/AdminRoutes';
-import { connectDB } from './database/db'; // import DB connection
+import { connectDB } from './database/db';
 
 dotenv.config();
-console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY?.slice(0, 8) + '...');
 const app = express();
-app.use(cors());
+
+// ✅ CORS cho WordPress site cụ thể và local test
+const allowedOrigins = [
+  'https://h7.homenest.tech',   // domain WordPress thật
+  'https://www.homenest.tech',  // nếu có www
+  'http://localhost:3000',      // local React test
+];
+
+// Middleware CORS chi tiết
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // cho Postman, curl
+    if (allowedOrigins.some(o => origin.startsWith(o))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+// Phục vụ preflight request cho tất cả route
+app.options('*', cors());
+
 app.use(bodyParser.json());
 
-// 🟢 Logger middleware để log mọi request và response
+// Logger middleware
 app.use((req, res, next) => {
   console.log('-----------------------------------');
   console.log(`Time: ${new Date().toISOString()}`);
@@ -38,17 +62,16 @@ app.use('/admin-api', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  console.log(`[Health Check] ${new Date().toISOString()} - Backend is running`);
   res.send('✅ ABC Chatbot backend running.');
 });
 
-// 🔹 Start server sau khi kết nối DB
+// Start server
 const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
-    await connectDB(); // kết nối MongoDB
+    await connectDB();
     app.listen(PORT, () => {
-      console.log(`\n✅ ABC Chatbot backend is running on http://localhost:${PORT}`);
+      console.log(`✅ Backend running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err);

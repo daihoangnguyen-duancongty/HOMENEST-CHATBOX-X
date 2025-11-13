@@ -90,7 +90,7 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
           <div className="chat-widget-header">
             <div className="chat-widget-header-left">
               <img src={userAvatar} alt="User" className="chat-widget-header-avatar" />
-              <span>X BOT HOMENEST</span>
+              <span>  HN CHATBOT X</span>
             </div>
             <div className="chat-widget-header-right">
               <div className="chat-widget-settings-wrapper">
