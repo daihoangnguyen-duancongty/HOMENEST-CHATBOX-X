@@ -5,39 +5,37 @@ import dotenv from 'dotenv';
 
 import chatRoutes from './routes/ChatRoutes';
 import adminRoutes from './routes/AdminRoutes';
-import { connectDB } from './database/db';
+import { connectDB } from './database/db'; // import DB connection
 
 dotenv.config();
+console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY?.slice(0, 8) + '...');
 const app = express();
-
-// ✅ CORS cho WordPress site cụ thể và local test
+// ✅ Khai báo allowedOrigins trước
 const allowedOrigins = [
   'https://h7.homenest.tech',   // domain WordPress thật
   'https://www.homenest.tech',  // nếu có www
   'http://localhost:3000',      // local React test
 ];
-
-// Middleware CORS chi tiết
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // cho Postman, curl
-    if (allowedOrigins.some(o => origin.startsWith(o))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
-    }
+  origin: (origin, callback) => {
+    // Cho phép requests không có origin (Postman, curl, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // Nếu origin nằm trong danh sách hoặc bắt đầu bằng domain cho phép
+    const allowed = allowedOrigins.some(o => origin.startsWith(o));
+    callback(null, allowed); // ❌ không ném lỗi nữa
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
-// Phục vụ preflight request cho tất cả route
+// Preflight request
 app.options('*', cors());
 
 app.use(bodyParser.json());
 
-// Logger middleware
+// 🟢 Logger middleware để log mọi request và response
 app.use((req, res, next) => {
   console.log('-----------------------------------');
   console.log(`Time: ${new Date().toISOString()}`);
@@ -62,16 +60,17 @@ app.use('/admin-api', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {
+  console.log(`[Health Check] ${new Date().toISOString()} - Backend is running`);
   res.send('✅ ABC Chatbot backend running.');
 });
 
-// Start server
+// 🔹 Start server sau khi kết nối DB
 const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
-    await connectDB();
+    await connectDB(); // kết nối MongoDB
     app.listen(PORT, () => {
-      console.log(`✅ Backend running on http://localhost:${PORT}`);
+      console.log(`\n✅ HomeNest Chatbot X backend is running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err);
