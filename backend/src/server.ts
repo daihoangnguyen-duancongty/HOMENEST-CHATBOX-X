@@ -26,11 +26,13 @@ app.use(cors({
     // Cho phép requests không có origin (Postman, curl, mobile apps)
     if (!origin) return callback(null, true);
 
+    // Nếu origin nằm trong whitelist
     if (allowedOrigins.some(o => origin.startsWith(o))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
+      return callback(null, true);
     }
+
+    // ❌ KHÔNG ném lỗi, chỉ block
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
