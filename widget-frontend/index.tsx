@@ -1,3 +1,4 @@
+// src/index.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChatWidget } from './src/components/ChatWidget';
@@ -8,7 +9,6 @@ declare global {
   }
 }
 
-// Lấy config từ PHP inject
 const widgetConfig = window.ABC_CHATBOT_WIDGET;
 
 if (widgetConfig?.clientId) {

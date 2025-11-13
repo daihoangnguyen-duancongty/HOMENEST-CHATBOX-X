@@ -19,7 +19,7 @@ interface GetMessagesResponse {
  */
 export const getChatHistory = async (clientId: string, backend: string = BASE_URL) => {
   try {
-    const res = await axios.get<GetMessagesResponse>(`${backend}/${clientId}`);
+    const res = await axios.get(`${backend}/${clientId}`);
     return res.data.messages || [];
   } catch (err) {
     console.error('getChatHistory error:', err);
@@ -29,7 +29,7 @@ export const getChatHistory = async (clientId: string, backend: string = BASE_UR
 
 export const sendMessageToAI = async (clientId: string, message: string, backend: string = BASE_URL) => {
   try {
-    const res = await axios.post<SendMessageResponse>(backend, { client_id: clientId, message });
+    const res = await axios.post(backend, { client_id: clientId, message });
     return res.data.reply;
   } catch (err) {
     console.error('sendMessageToAI error:', err);

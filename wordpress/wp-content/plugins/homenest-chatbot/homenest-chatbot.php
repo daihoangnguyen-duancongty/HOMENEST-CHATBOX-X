@@ -36,11 +36,10 @@ add_action('wp_footer', function() {
 // ✅ Shortcode để nhúng chatbot vào page/post
 add_shortcode('homenest_chatbot', function($atts) {
     $atts = shortcode_atts(array(
-        'client_id' => 'testclient123', // default clientId
-        'api_endpoint' => 'https://backend-railway.up.railway.app/api/chat'
+        'client_id' => 'testclient123',
+        'api_endpoint' => 'https://homenest-chatbox-x-production.up.railway.app/api/chat' // ✅ HTTPS đầy đủ
     ), $atts);
 
-    // Inject cấu hình JS (chạy trước bundle.js)
     ob_start();
     ?>
     <script>
@@ -54,6 +53,7 @@ add_shortcode('homenest_chatbot', function($atts) {
     <?php
     return ob_get_clean();
 });
+
 
 // ✅ Trang quản trị Dashboard
 add_action('admin_menu', function() {
