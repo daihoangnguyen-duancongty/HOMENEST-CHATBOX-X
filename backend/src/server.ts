@@ -67,6 +67,9 @@ app.use('/admin-api', adminRoutes);
 app.get('/', (_req, res) => {
   res.send('✅ ABC Chatbot backend running.');
 });
+app.get('/api/test-cors', (req, res) => {
+  res.json({ message: '✅ CORS works!' });
+});
 
 // 🔹 Start server
 const PORT = process.env.PORT || 5000;
