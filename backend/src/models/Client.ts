@@ -10,6 +10,7 @@ export interface IClient extends Document {
   ai_provider: string;      // 'openai' | 'claude' | 'gemini'
   created_at: Date;
   meta?: Record<string, any>;
+   user_count?: number;
 }
 
 // Schema
@@ -23,6 +24,7 @@ const ClientSchema: Schema<IClient> = new Schema({
   ai_provider: { type: String, default: 'openai' },
   created_at: { type: Date, default: Date.now },
   meta: { type: Schema.Types.Mixed, default: {} },
+   user_count: { type: Number, default: 0 }, 
 });
 
 // Optional index theo domain
