@@ -96,7 +96,7 @@ body {
   /* overflow: hidden; */
   z-index: 10;
   box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  background: linear-gradient(135deg, #092685, #34a9ec, #092685);
 }
 
 .chat-widget-header-left {
@@ -178,7 +178,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
- 
+   
   /* background: #fefefe; */
   background: linear-gradient(135deg, #f6f7f8, #ffffff);
 }
@@ -271,6 +271,12 @@ body {
   /* background: #ddcfcc; */
   /* border-top: 1px solid #ccc; */
   /* background: linear-gradient(135deg, #2142b1, #13376e); */
+   /* —— Glass Blur —— */
+  background: rgba(255, 255, 255, 0.25);     /* lớp mờ */
+  backdrop-filter: blur(12px) saturate(160%); 
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  border-top: 1px solid rgba(189, 194, 235, 0.35); 
+  border-bottom: 1px solid rgba(191, 188, 238, 0.15);
 }
 .quick-action-button {
   /* background: linear-gradient(135deg, #cfd3d8, #500b5eda, #2a6dd3);  */
