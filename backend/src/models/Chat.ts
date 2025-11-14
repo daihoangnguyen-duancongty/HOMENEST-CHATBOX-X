@@ -8,9 +8,9 @@ export interface IChatMessage {
 
 export interface IChat extends Document {
   clientId: string;
-  userId: string;       // ID người dùng đăng nhập
-  userName?: string;    // tên hiển thị user
-  userAvatar?: string;  // avatar user
+  userId: string;
+  userName?: string;
+  userAvatar?: string;
   messages: IChatMessage[];
   createdAt: Date;
   updatedAt: Date;

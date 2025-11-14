@@ -5,7 +5,12 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
 export interface AuthRequest extends Request {
-  user?: { userId: string; clientId: string; name: string };
+  user?: {
+    userId: string;
+    clientId: string;
+    name: string;
+    avatar?: string; 
+  };
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {

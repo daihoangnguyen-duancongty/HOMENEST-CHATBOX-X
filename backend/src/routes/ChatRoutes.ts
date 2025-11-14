@@ -11,15 +11,15 @@ router.post('/chat', authMiddleware, async (req: AuthRequest, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: 'Missing message' });
 
-    const userId = req.user?.userId;
-    const clientId = req.user?.clientId;
+    // Gán thông tin user vào body trước khi gọi controller
+    req.body.client_id = req.user?.clientId;
+    req.body.user_id = req.user?.userId;
+    req.body.user_name = req.user?.name;
+    req.body.user_avatar = req.user?.avatar;
 
-    if (!userId || !clientId) return res.status(401).json({ error: 'Unauthorized' });
+    // Gọi controller
+    await chatWithAI(req, res);
 
-    // gọi controller chatWithAI đã chỉnh sửa nhận userId và clientId
-    const botReply = await chatWithAI(userId, clientId, message);
-
-    res.json({ reply: botReply });
   } catch (err) {
     console.error('chat POST error:', err);
     res.status(500).json({ error: 'Server error' });

@@ -23,7 +23,19 @@ export const chatWithAI = async (req: Request, res: Response) => {
 
     // Find chat by clientId + userId
     let chat = await ChatModel.findOne({ clientId: client_id, userId: user_id });
-    if (!chat) chat = new ChatModel({ clientId: client_id, userId: user_id, userName: user_name, userAvatar: user_avatar, messages: [] });
+    if (!chat) {
+      chat = new ChatModel({
+        clientId: client_id,
+        userId: user_id,
+        userName: user_name,
+        userAvatar: user_avatar,
+        messages: [],
+      });
+    } else {
+      // Update name/avatar nếu thay đổi
+      chat.userName = user_name || chat.userName;
+      chat.userAvatar = user_avatar || chat.userAvatar;
+    }
 
     const userMsg: IChatMessage = { from: 'user', text: message };
     const botMsg: IChatMessage = { from: 'bot', text: botReply };
@@ -31,7 +43,7 @@ export const chatWithAI = async (req: Request, res: Response) => {
     chat.messages.push(userMsg, botMsg);
     await chat.save();
 
-    return res.json({ reply: botReply });
+    return res.json({ reply: botReply, chatId: chat._id });
 
   } catch (err) {
     console.error('chatWithAI error:', err);
