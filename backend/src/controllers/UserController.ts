@@ -19,7 +19,6 @@ export const registerUser = async (req: Request, res: Response) => {
   const user = new UserModel({ userId: uuidv4(), clientId, username, password, name, avatar });
   await user.save();
 
-  // tăng user_count cho client
   client.user_count = (client.user_count || 0) + 1;
   await client.save();
 
@@ -36,6 +35,6 @@ export const loginUser = async (req: Request, res: Response) => {
   const valid = await user.comparePassword(password);
   if (!valid) return res.status(401).json({ error: 'Invalid password' });
 
-  const token = jwt.sign({ userId: user.userId, clientId: user.clientId, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign({ userId: user.userId, clientId: user.clientId, name: user.name, avatar: user.avatar }, JWT_SECRET, { expiresIn: '7d' });
   res.json({ ok: true, token, user: { name: user.name, avatar: user.avatar } });
 };

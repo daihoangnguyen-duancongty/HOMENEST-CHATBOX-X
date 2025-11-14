@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import chatRoutes from './routes/ChatRoutes';
 import adminRoutes from './routes/AdminRoutes';
+import userRoutes from './routes/UserRoutes';
 import { connectDB } from './database/db';
 
 dotenv.config();
@@ -62,6 +63,7 @@ app.use((req, res, next) => {
 
 // API routes
 app.use('/api', chatRoutes);
+app.use('/api', userRoutes);
 app.use('/admin-api', adminRoutes);
 
 // Health check

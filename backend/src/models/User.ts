@@ -1,4 +1,3 @@
-// src/models/User.ts
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -6,10 +5,10 @@ export interface IUser extends Document {
   userId: string;
   clientId: string;
   username: string;
-  password: string; // hashed
+  password: string;
   name: string;
   avatar?: string;
-  api_key?: string; // key riêng cho OpenAI nếu muốn
+  api_key?: string;
   created_at: Date;
   comparePassword(candidate: string): Promise<boolean>;
 }
@@ -25,7 +24,6 @@ const UserSchema: Schema<IUser> = new Schema({
   created_at: { type: Date, default: Date.now },
 });
 
-// hash password trước khi save
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -33,7 +31,6 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-// method so sánh password
 UserSchema.methods.comparePassword = async function (candidate: string) {
   return bcrypt.compare(candidate, this.password);
 };
