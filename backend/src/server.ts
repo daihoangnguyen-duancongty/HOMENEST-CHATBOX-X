@@ -18,6 +18,7 @@ const allowedOrigins = [
   'https://h7.homenest.tech',   // domain WordPress thật
   'https://www.homenest.tech',  // nếu có www
   'http://localhost:3000',      // local React test
+  'http://localhost:5173',
 ];
 
 // 🌐 CORS middleware toàn cục

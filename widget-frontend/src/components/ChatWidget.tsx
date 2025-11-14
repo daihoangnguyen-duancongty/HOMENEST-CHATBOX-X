@@ -2,13 +2,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage, WidgetProps } from '../types';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { FiSend, FiPaperclip, FiSmile, FiSettings, FiX } from 'react-icons/fi';
+import { FiSend, FiPaperclip, FiSmile, FiSettings, FiX,FiLink } from 'react-icons/fi';
+
 import { getChatHistory, sendMessageToAI } from '../apis/chatApi';
+
 
 export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => {
   const botIcon =
-    'https://static.vecteezy.com/system/resources/thumbnails/071/433/877/small/ai-chatbot-icon-a-friendly-robot-symbol-in-a-speech-bubble-for-digital-communication-png.png';
-  const userAvatar = 'https://via.placeholder.com/36';
+    'https://homenest.com.vn/wp-content/uploads/2025/06/middle.webp';
+  const userAvatar = 'https://img.freepik.com/vector-mien-phi/v%C3%B2ng-tr%C3%B2n-m%C3%A0u-xanh-v%E1%BB%9Bi-ng%C6%B0%E1%BB%9Di-d%C3%B9ng-m%C3%A0u-tr%E1%BA%AFng_78370-4707.jpg?semt=ais_hybrid&w=740&q=80';
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -68,7 +70,19 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
   const onEmojiClick = (emojiData: EmojiClickData) => setInput(prev => prev + emojiData.emoji);
 
   return (
+   
+     
+      
     <div className="chat-widget-container">
+       <div className="chat-widget-popup-wrapper">
+        
+         {/* Send Button */}
+{open && (
+  <button className="chat-widget-send-button" onClick={() => sendMessage(input)}>
+    <FiSend size={22} />
+  </button>
+)}
+
       {!open && (
         <button
           onClick={() => setOpen(true)}
@@ -140,36 +154,69 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
             </div>
           )}
 
-          {/* Input */}
-          <div className="chat-widget-input">
-            <input
-              className="chat-widget-input-text"
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
-              placeholder="Nhập tin nhắn..."
-            />
-            <button className="chat-widget-send-button" onClick={() => sendMessage(input)}>
-              <FiSend size={22} />
-            </button>
-            <label className="chat-widget-file-button">
-              <FiPaperclip size={18} color="#dadedfff" />
-              <input type="file" style={{ display: 'none' }} onChange={handleFileUpload} />
-            </label>
-            <div style={{ position: 'relative' }}>
-              <button onClick={() => setShowEmojiPicker(prev => !prev)} className="chat-widget-smile-button">
-                <FiSmile size={20} color="#dadedfff" />
-              </button>
-              {showEmojiPicker && (
-                <div style={{ position: 'absolute', bottom: '50px', right: 0, zIndex: 1100 }}>
-                  <EmojiPicker onEmojiClick={onEmojiClick} />
-                </div>
-              )}
-            </div>
-          </div>
+
+          {/* Input wrapper */}
+   <div className="chat-widget-input-wrapper">
+       {/* Icon trên khung input */}
+{/* <div className="chat-widget-input-top-icons-wrapper">
+
+
+ <FiLink size={13} className="chat-widget-input-top-icons" />
+ <FiLink size={13} className="chat-widget-input-top-icons" />
+</div> */}
+      {/* Input */}
+  <input
+    className="chat-widget-input-text"
+    type="text"
+    value={input}
+    onChange={e => setInput(e.target.value)}
+    onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
+    placeholder="Nhập tin nhắn..."
+  />
+   
+
+
+
+  {/* Icon dưới khung input */}
+  <div className="chat-widget-input-bottom-icons">
+    {/* File */}
+    <label className="chat-widget-file-button">
+      <FiPaperclip size={20} />
+      <input type="file" style={{ display: 'none' }} onChange={handleFileUpload} />
+    </label>
+
+    {/* Emoji */}
+    <div style={{ position: 'relative' }}>
+      <button onClick={() => setShowEmojiPicker(prev => !prev)} className="chat-widget-smile-button">
+        <FiSmile size={20} />
+      </button>
+     {showEmojiPicker && (
+    <div className="chat-widget-emoji-picker right">
+      <EmojiPicker
+        onEmojiClick={onEmojiClick}
+        height={450}
+        width={350}
+      />
+    </div>
+  )}
+
+    </div>
+  </div>
+
+  {/* Powered by HomeNest */}
+  <div className="chat-widget-powered">
+    <hr/>
+    Powered by  <img
+      src="https://homenest.com.vn/wp-content/uploads/2025/07/Logo_HomeNest-team.webp"
+      alt="HomeNest"
+    /> HomeNest
+  </div>
+</div>
+
+ 
         </div>
       )}
+    </div>
     </div>
   );
 };
