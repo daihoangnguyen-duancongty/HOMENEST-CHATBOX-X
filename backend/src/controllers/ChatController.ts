@@ -5,22 +5,25 @@ import { ChatModel, IChatMessage } from '../models/Chat';
 
 export const chatWithAI = async (req: Request, res: Response) => {
   try {
-    const { client_id, message } = req.body;
-    if (!client_id || !message) return res.status(400).json({ error: 'Missing client_id or message' });
+    const { client_id, user_id, user_name, user_avatar, message } = req.body;
 
-    // 1️⃣ Check client exists
+    if (!client_id || !user_id || !message) {
+      return res.status(400).json({ error: 'Missing client_id, user_id, or message' });
+    }
+
+    // Check client exists
     const client = await ClientModel.findOne({ clientId: client_id });
     if (!client) return res.status(404).json({ error: 'Client not found' });
 
-    // 2️⃣ Determine AI provider
+    // AI provider
     const aiProvider = client.ai_provider || 'openai';
 
-    // 3️⃣ Call AI service
+    // Call AI service
     const botReply = await AIService.getResponse(aiProvider, message);
 
-    // 4️⃣ Save message to Chat collection
-    let chat = await ChatModel.findOne({ clientId: client_id });
-    if (!chat) chat = new ChatModel({ clientId: client_id, messages: [] });
+    // Find chat by clientId + userId
+    let chat = await ChatModel.findOne({ clientId: client_id, userId: user_id });
+    if (!chat) chat = new ChatModel({ clientId: client_id, userId: user_id, userName: user_name, userAvatar: user_avatar, messages: [] });
 
     const userMsg: IChatMessage = { from: 'user', text: message };
     const botMsg: IChatMessage = { from: 'bot', text: botReply };
@@ -28,7 +31,6 @@ export const chatWithAI = async (req: Request, res: Response) => {
     chat.messages.push(userMsg, botMsg);
     await chat.save();
 
-    // 5️⃣ Return bot reply to frontend
     return res.json({ reply: botReply });
 
   } catch (err) {
