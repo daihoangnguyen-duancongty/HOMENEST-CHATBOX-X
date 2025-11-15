@@ -21,7 +21,7 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
     const exists = await UserModel.findOne({ username, clientId });
     if (exists) return res.status(400).json({ error: "Username already exists" });
 
-    // Tạo client owner
+    // Tạo client-owner
     const user = await UserModel.create({
       userId: uuidv4(),
       clientId,
@@ -32,19 +32,23 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
       role: "client",
     });
 
-    // ✅ Cập nhật client, tạo nếu chưa tồn tại
-    await ClientModel.findOneAndUpdate(
-      { clientId },
-      {
+    // ✅ Cập nhật client collection
+    const client = await ClientModel.findOne({ clientId });
+    if (!client) {
+      // Client chưa tồn tại → tạo mới
+      await ClientModel.create({
         clientId,
-        name: name, // dùng tên của owner làm tên client tạm
+        name, // dùng tên owner làm tên client tạm
         ai_provider: "openai",
         color: "#0b74ff",
         welcome_message: "Xin chào! Mình có thể giúp gì?",
         user_count: 1, // có 1 owner
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+      });
+    } else {
+      // Client đã tồn tại → chỉ tăng user_count, không ghi đè name, color,...
+      client.user_count = (client.user_count || 0) + 1;
+      await client.save();
+    }
 
     return res.json({ ok: true, userId: user.userId });
   } catch (err: any) {
@@ -59,7 +63,7 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
 //
 export const clientCreateEmployee = async (req: Request, res: Response) => {
   try {
-    const loggedUser: any = req.body._user; // được đính từ middleware
+    const loggedUser: any = req.body._user; // từ middleware auth
 
     if (loggedUser.role !== "client")
       return res.status(403).json({ error: "Forbidden" });
@@ -73,7 +77,7 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
     const exists = await UserModel.findOne({ username, clientId });
     if (exists) return res.status(400).json({ error: "Username already exists" });
 
-    // Tạo nhân viên telesale
+    // Tạo nhân viên
     const user = await UserModel.create({
       userId: uuidv4(),
       clientId,
@@ -84,12 +88,15 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
       role: "employee",
     });
 
-    // ✅ Cập nhật user_count của client, tạo nếu chưa tồn tại
-    await ClientModel.findOneAndUpdate(
-      { clientId },
-      { $inc: { user_count: 1 } },
-      { upsert: true, setDefaultsOnInsert: true }
-    );
+    // ✅ Tăng user_count cho client hiện có
+    const client = await ClientModel.findOne({ clientId });
+    if (client) {
+      client.user_count = (client.user_count || 0) + 1;
+      await client.save();
+    } else {
+      // Client không tồn tại → không tạo mới, log cảnh báo
+      console.warn(`Client ${clientId} not found when creating employee`);
+    }
 
     return res.json({ ok: true, userId: user.userId });
   } catch (err: any) {
@@ -114,7 +121,7 @@ export const loginUser = async (req: Request, res: Response) => {
   const valid = await user.comparePassword(password);
   if (!valid) return res.status(401).json({ error: "Invalid password" });
 
-  // Thêm role vào token!
+  // Thêm role vào token
   const token = jwt.sign(
     {
       userId: user.userId,
