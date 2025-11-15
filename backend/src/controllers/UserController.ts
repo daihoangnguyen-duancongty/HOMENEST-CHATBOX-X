@@ -32,6 +32,20 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
       role: "client",
     });
 
+    // ✅ Cập nhật client, tạo nếu chưa tồn tại
+    await ClientModel.findOneAndUpdate(
+      { clientId },
+      {
+        clientId,
+        name: name, // dùng tên của owner làm tên client tạm
+        ai_provider: "openai",
+        color: "#0b74ff",
+        welcome_message: "Xin chào! Mình có thể giúp gì?",
+        user_count: 1, // có 1 owner
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
     return res.json({ ok: true, userId: user.userId });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
@@ -70,10 +84,11 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
       role: "employee",
     });
 
-    // Tăng số lượng user cho client
-    await ClientModel.updateOne(
+    // ✅ Cập nhật user_count của client, tạo nếu chưa tồn tại
+    await ClientModel.findOneAndUpdate(
       { clientId },
       { $inc: { user_count: 1 } },
+      { upsert: true, setDefaultsOnInsert: true }
     );
 
     return res.json({ ok: true, userId: user.userId });
@@ -106,7 +121,7 @@ export const loginUser = async (req: Request, res: Response) => {
       clientId: user.clientId,
       name: user.name,
       avatar: user.avatar,
-      role: user.role, // <<< BẮT BUỘC !!!
+      role: user.role,
     },
     JWT_SECRET,
     { expiresIn: "7d" }
