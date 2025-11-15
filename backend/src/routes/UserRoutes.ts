@@ -19,6 +19,6 @@ router.post("/client/reactivate", authMiddleware, reactivateClient);
 router.post("/client/create-employee", authMiddleware, requireRole("client"), clientCreateEmployee);
 
 // Login chung
-router.post("/login-client", loginUser);
+router.post("/login", loginUser);
 
 export default router;
