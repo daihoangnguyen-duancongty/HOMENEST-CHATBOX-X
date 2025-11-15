@@ -8,10 +8,11 @@ export const chatWithAI = async (req: Request, res: Response) => {
     const { client_id, user_id, user_name, user_avatar, message } = req.body;
     if (!client_id || !user_id || !message) return res.status(400).json({ error: 'Missing client_id, user_id, or message' });
 
-    const client = await ClientModel.findOne({ clientId: client_id });
-    if (!client) return res.status(404).json({ error: 'Client not found' });
+   const client = await ClientModel.findOne({ clientId: client_id });
+if (!client) return res.status(404).json({ error: 'Client not found' });
 
-    const botReply = await AIService.getResponse(client.ai_provider || 'openai', message);
+const botReply = await AIService.getResponse(client, message);
+
 
     let chat = await ChatModel.findOne({ clientId: client_id, userId: user_id });
     if (!chat) {

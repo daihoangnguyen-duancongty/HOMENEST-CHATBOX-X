@@ -7,10 +7,16 @@ export interface IClient extends Document {
   color?: string;
   logo_url?: string;
   welcome_message?: string;
-  ai_provider: string;
+  ai_provider: string; // default AI provider
   user_count?: number;
   created_at: Date;
   meta?: Record<string, any>;
+  api_keys?: {
+    openai?: string;
+    claude?: string;
+    gemini?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 const ClientSchema: Schema<IClient> = new Schema({
@@ -21,6 +27,7 @@ const ClientSchema: Schema<IClient> = new Schema({
   logo_url: { type: String },
   welcome_message: { type: String, default: 'Xin chào! Mình có thể giúp gì?' },
   ai_provider: { type: String, default: 'openai' },
+  api_keys: { type: Schema.Types.Mixed, default: {} },
   created_at: { type: Date, default: Date.now },
   meta: { type: Schema.Types.Mixed, default: {} },
   user_count: { type: Number, default: 0 },
