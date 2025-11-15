@@ -49,52 +49,44 @@ Mở DevTools (F12) → tab Network kiểm tra request gửi tới backend.
 
 Mở Console xem có lỗi nào liên quan đến clientId hoặc API không.
 
+
+#---------------------Test Postman---------------------------------------
+
+
+
+
+
+
 #---------------------Sử dụng---------------------------------------------
--> Tạo tài khoản Admin của HomeNest
+-> ==============================Tạo tài khoản Admin của HomeNest
 
-1. Tạo admin trực tiếp trong MongoDB Atlas
-Bước 1: Mở MongoDB Compass → chọn database → collection users
-Bước 2: Ấn Insert Document và dán nội dung sau:
+Bước 1: Tạo admin trực tiếp trong MongoDB Atlas
+Register admin qua Postman / frontend:
 
-{
-  "userId": "admin-0001",
-  "clientId": null,
-  "username": "superadmin",
-  "password": "$2b$10$mR3G7J4iPvt1Tj3gYag29OQfcJrG4BCfs5nu9e", 
-  "name": "HomeNest Super Admin",
-  "avatar": null,
-  "role": "admin",
-  "created_at": "2025-11-15T00:00:00.000Z"
-}
-🔑 Mật khẩu gốc "12345678" đã được hash sẵn bằng bcrypt.
-
-(Vì password trên đã được hash bằng bcrypt để phù hợp model.)
-
-Bước 3:
-4) Sau khi insert, dùng API login:
-
-POST
-
-https://homenest-chatbox-x-production.up.railway.app/admin-api/login
-
-
-Body
-
-{
+POST https://homenest-chatbox-x-production.up.railway.app/admin-api/auth/register
+Body: {
   "username": "superadmin",
   "password": "12345678",
-  "name": "Super Admin",
-  "avatar": null
+  "name": "HomeNest Super Admin",
+  "avatar": "https://i.pravatar.cc/150?u=superadmin"
 }
 
 
+Bước 2: Login admin qua:
 
+POST https://homenest-chatbox-x-production.up.railway.app/admin-api/auth/login
+Body: {
+  "username": "superadmin",
+  "password": "12345678"
+}
+
+Bước 3: Lấy token Admin
 
 Nhận token để gọi các route admin.
 
 
 
--> Homenest Admin tạo tài khoản Client
+->==================================================== Homenest Admin tạo tài khoản Client
 
 - đăng ký client (do công ty tạo chứ ko đăng ký) khi có người dùng mua gói chatbot (1 client cớ thể có nhiều user sử dụng bên trong với lịch sử chat riêng biệt)
 
@@ -120,4 +112,4 @@ Body:
 }
 
 
--> Client sẽ đăng nhập vào dashboard và tự tạo các user của họ
+-> =====================================================Client sẽ đăng nhập vào dashboard và tự tạo các user của họ

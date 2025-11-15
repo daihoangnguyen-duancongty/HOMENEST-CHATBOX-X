@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import chatRoutes from './routes/ChatRoutes';
 import adminRoutes from './routes/AdminRoutes';
 import userRoutes from './routes/UserRoutes';
+import adminAuthRoutes from "./routes/AdminAuthRoutes";
 
 import { connectDB } from './database/db';
 
@@ -67,7 +68,7 @@ app.use((req, res, next) => {
 app.use('/api', chatRoutes);
 app.use('/api', userRoutes);
 app.use('/admin-api', adminRoutes);
-
+app.use("/admin-api/auth", adminAuthRoutes);
 // Health check
 app.get('/', (_req, res) => {
   res.send('✅ ABC Chatbot backend running.');
