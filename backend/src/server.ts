@@ -8,6 +8,7 @@ import adminRoutes from './routes/AdminRoutes';
 import userRoutes from './routes/UserRoutes';
 import { connectDB } from './database/db';
 
+
 dotenv.config();
 
 console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY?.slice(0, 8) + '...');

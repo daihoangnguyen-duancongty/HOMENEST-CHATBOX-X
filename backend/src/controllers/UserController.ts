@@ -11,11 +11,13 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 // 1) ADMIN TẠO CLIENT-OWNER
 // ──────────────────────────────────────────────────────────────
 //
+
+
 export const adminCreateClientUser = async (req: Request, res: Response) => {
   try {
-    const { clientId, username, password, name, avatar } = req.body;
+    const { clientId, username, password, name, avatar, ai_provider, api_keys, meta } = req.body;
 
-    if (!clientId || !username || !password || !name)
+    if (!clientId || !username || !password || !name) 
       return res.status(400).json({ error: "Missing fields" });
 
     const exists = await UserModel.findOne({ username, clientId });
@@ -32,20 +34,27 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
       role: "client",
     });
 
-    // ✅ Cập nhật client collection
+    // Tính trial 2 tháng
+    const now = new Date();
+    const trialEnd = new Date();
+    trialEnd.setMonth(trialEnd.getMonth() + 2);
+
+    // Cập nhật client collection
     const client = await ClientModel.findOne({ clientId });
     if (!client) {
-      // Client chưa tồn tại → tạo mới
       await ClientModel.create({
         clientId,
-        name, // dùng tên owner làm tên client tạm
-        ai_provider: "openai",
-        color: "#0b74ff",
-        welcome_message: "Xin chào! Mình có thể giúp gì?",
-        user_count: 1, // có 1 owner
+        name,
+        ai_provider: ai_provider || "openai",
+        api_keys: api_keys || {},
+        meta: meta || {},
+        user_count: 1,
+        active: true,
+        trial: true,
+        trial_end: trialEnd,
       });
     } else {
-      // Client đã tồn tại → chỉ tăng user_count, không ghi đè name, color,...
+      // Nếu client đã tồn tại → chỉ tăng user_count
       client.user_count = (client.user_count || 0) + 1;
       await client.save();
     }
@@ -55,6 +64,7 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
 
 //
 // ──────────────────────────────────────────────────────────────

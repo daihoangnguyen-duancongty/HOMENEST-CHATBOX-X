@@ -17,6 +17,10 @@ export interface IClient extends Document {
     gemini?: string;
     [key: string]: string | undefined;
   };
+    // 🔹 Thêm các field mới
+  active?: boolean;
+  trial?: boolean;
+  trial_end?: Date;
 }
 
 const ClientSchema: Schema<IClient> = new Schema({
@@ -31,6 +35,10 @@ const ClientSchema: Schema<IClient> = new Schema({
   created_at: { type: Date, default: Date.now },
   meta: { type: Schema.Types.Mixed, default: {} },
   user_count: { type: Number, default: 0 },
+    // 🔹 Thêm trial & active
+  active: { type: Boolean, default: true },
+  trial: { type: Boolean, default: true },
+  trial_end: { type: Date },
 });
 
 ClientSchema.index({ domain: 1 });
