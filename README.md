@@ -50,10 +50,51 @@ Mở DevTools (F12) → tab Network kiểm tra request gửi tới backend.
 Mở Console xem có lỗi nào liên quan đến clientId hoặc API không.
 
 #---------------------Sử dụng---------------------------------------------
+-> tạo tài khoản Admin
 
-Homenest
+1. Tạo admin trực tiếp trong MongoDB Atlas
+Bước 1: Mở MongoDB Compass → chọn database → collection users
+Bước 2: Ấn Insert Document và dán nội dung sau:
+{
+  "userId": "admin-0002",
+  "clientId": "admin002",
+  "username": "homenest-superadmin",
+  "password": "$2b$10$mR3G7J4iPvt1Tj3gYag29OQfcJrj2qEp6IuAJZJhBrG4BCfs5nu9e",
+  "name": "HomeNestSuper Admin",
+  "avatar": "https://i.pravatar.cc/150?u=superadmin",
+  "role": "admin"
+}
 
--> đăng ký client (do công ty tạo chứ ko đăng ký) khi có người dùng mua gói chatbot (1 client cớ thể có nhiều user sử dụng bên trong với lịch sử chat riêng biệt)
+
+🔐 Mật khẩu: 12345678
+
+(Vì password trên đã được hash bằng bcrypt để phù hợp model.)
+
+Bước 3:
+4) Sau khi insert, dùng API login:
+
+POST
+
+https://homenest-chatbox-x-production.up.railway.app/admin-api/login
+
+
+Body
+
+{
+  "clientId": "admin002",
+  "username": "homenest-superadmin",
+  "password": "12345678"
+}
+
+
+
+Bạn sẽ nhận token để gọi các route admin.
+
+
+
+-> Homenest Admin tạo tài khoản Client
+
+- đăng ký client (do công ty tạo chứ ko đăng ký) khi có người dùng mua gói chatbot (1 client cớ thể có nhiều user sử dụng bên trong với lịch sử chat riêng biệt)
 
  Tạo client qua endpoint Admin trên Postman
 
@@ -77,3 +118,4 @@ Body:
 }
 
 
+-> Client sẽ đăng nhập vào dashboard và tự tạo các user của họ
