@@ -48,3 +48,32 @@ Nếu mọi thứ đúng, bot sẽ phản hồi.
 Mở DevTools (F12) → tab Network kiểm tra request gửi tới backend.
 
 Mở Console xem có lỗi nào liên quan đến clientId hoặc API không.
+
+#---------------------Sử dụng---------------------------------------------
+
+Homenest
+
+-> đăng ký client (do công ty tạo chứ ko đăng ký) khi có người dùng mua gói chatbot (1 client cớ thể có nhiều user sử dụng bên trong với lịch sử chat riêng biệt)
+
+ Tạo client qua endpoint Admin trên Postman
+
+Nếu đã triển khai /admin-api/clients:
+
+URL: POST /admin-api/clients
+
+Headers: Authorization: Bearer <ADMIN_SYNC_TOKEN>
+
+Body:
+{
+  "action": "create",
+  "client": {
+    "clientId": "testclient123",
+    "name": "Test Client",
+    "domain": "example.com",
+    "color": "#0b74ff",
+    "welcome_message": "Xin chào!",
+    "ai_provider": "openai"
+  }
+}
+
+
