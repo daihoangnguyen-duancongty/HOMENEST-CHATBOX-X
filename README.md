@@ -50,23 +50,23 @@ Mở DevTools (F12) → tab Network kiểm tra request gửi tới backend.
 Mở Console xem có lỗi nào liên quan đến clientId hoặc API không.
 
 #---------------------Sử dụng---------------------------------------------
--> tạo tài khoản Admin
+-> Tạo tài khoản Admin của HomeNest
 
 1. Tạo admin trực tiếp trong MongoDB Atlas
 Bước 1: Mở MongoDB Compass → chọn database → collection users
 Bước 2: Ấn Insert Document và dán nội dung sau:
+
 {
-  "userId": "admin-0002",
-  "clientId": "admin002",
-  "username": "homenest-superadmin",
-  "password": "$2b$10$mR3G7J4iPvt1Tj3gYag29OQfcJrj2qEp6IuAJZJhBrG4BCfs5nu9e",
-  "name": "HomeNestSuper Admin",
-  "avatar": "https://i.pravatar.cc/150?u=superadmin",
-  "role": "admin"
+  "userId": "admin-0001",
+  "clientId": null,
+  "username": "superadmin",
+  "password": "$2b$10$mR3G7J4iPvt1Tj3gYag29OQfcJrG4BCfs5nu9e", 
+  "name": "HomeNest Super Admin",
+  "avatar": null,
+  "role": "admin",
+  "created_at": "2025-11-15T00:00:00.000Z"
 }
-
-
-🔐 Mật khẩu: 12345678
+🔑 Mật khẩu gốc "12345678" đã được hash sẵn bằng bcrypt.
 
 (Vì password trên đã được hash bằng bcrypt để phù hợp model.)
 
@@ -81,14 +81,16 @@ https://homenest-chatbox-x-production.up.railway.app/admin-api/login
 Body
 
 {
-  "clientId": "admin002",
-  "username": "homenest-superadmin",
-  "password": "12345678"
+  "username": "superadmin",
+  "password": "12345678",
+  "name": "Super Admin",
+  "avatar": null
 }
 
 
 
-Bạn sẽ nhận token để gọi các route admin.
+
+Nhận token để gọi các route admin.
 
 
 
