@@ -6,6 +6,19 @@ export default `#graphql
     active: Boolean
   }
 
+  type User {
+    userId: ID!
+    name: String!
+    role: String!
+    clientId: String
+    avatar: String
+  }
+
+  type LoginResponse {
+    token: String!
+    user: User!
+  }
+
   type Query {
     clients: [Client]
     client(clientId: String!): Client
@@ -13,5 +26,6 @@ export default `#graphql
 
   type Mutation {
     createClient(name: String!, clientId: String!): Client
+    loginUser(clientId: String!, username: String!, password: String!): LoginResponse
   }
 `;
