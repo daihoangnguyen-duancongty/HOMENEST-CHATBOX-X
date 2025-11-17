@@ -141,14 +141,24 @@ backend/
 ├─ package.json
 └─ tsconfig.json
 
-/dashboard
-├─ app/
-│ ├─ admin/
-│ ├─ dashboard/
-│ ├─ login/
-│ ├─ graphql/
-│ │ ├─ client.ts
-│ │ └─ queries/
-│ ├─ sentry.client.config.ts
-│ └─ sentry.server.config.ts
-├─ package.json
+/dashboard/src/app/
+├─ admin/
+│  ├─ clients/
+│  │  └─ page.tsx
+│  ├─ users/
+│  │  └─ page.tsx
+│  ├─ plans/
+│  │  └─ page.tsx
+│  └─ page.tsx           <-- Admin dashboard home
+├─ client/
+│  ├─ employees/
+│  │  └─ page.tsx
+│  ├─ profile/
+│  │  └─ page.tsx
+│  ├─ api-keys/
+│  │  └─ page.tsx
+│  └─ subscription/
+│     └─ page.tsx
+├─ login/
+│  └─ page.tsx
+└─ page.tsx               <-- root page, redirect / → /login
