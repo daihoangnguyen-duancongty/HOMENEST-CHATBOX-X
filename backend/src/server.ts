@@ -3,8 +3,9 @@ import "./instrument";
 
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+
 import bodyParser from "body-parser";
-import { ApolloServer } from "@apollo/server";
+import { ApolloServer, HeaderMap } from "@apollo/server";
 import Sentry from "./instrument"; // import từ instrument.ts
 
 import schema from "./graphql/schema";
@@ -67,23 +68,30 @@ const startApolloServer = async () => {
   const server = new ApolloServer({ typeDefs: schema, resolvers });
   await server.start();
 
- app.use("/graphql", async (req, res, next) => {
-  try {
-    const result = await server.executeHTTPGraphQLRequest({
-      httpGraphQLRequest: {
-        body: req.body,
-        headers: req.headers as any, // <-- ép kiểu any để TS không complain
-        method: req.method,
-        search: req.url?.split("?")[1] ?? "",
-      },
-      context: async () => ({ req, res }),
-    });
-    res.status(result.status || 200).json(result.body);
-  } catch (err) {
-    next(err);
-  }
-});
+  app.use("/graphql", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Convert headers sang HeaderMap để Apollo v4 chấp nhận
+      const headers = new HeaderMap();
+      for (const [key, value] of Object.entries(req.headers)) {
+        if (typeof value === "string") headers.set(key, value);
+        else if (Array.isArray(value)) headers.set(key, value.join(","));
+      }
 
+      const result = await server.executeHTTPGraphQLRequest({
+        httpGraphQLRequest: {
+          body: req.body,
+          headers,
+          method: req.method,
+          search: req.url?.split("?")[1] ?? "",
+        },
+        context: async () => ({ req, res }),
+      });
+
+      res.status(result.status || 200).json(result.body);
+    } catch (err) {
+      next(err);
+    }
+  });
 };
 
 // ----------------- Sentry error middleware -----------------
