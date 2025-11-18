@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { getToken, removeToken } from "./token";
+import { useAuthStore } from "@/store/auth";
+import { removeToken } from "./token";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
@@ -7,17 +8,14 @@ export async function fetcher<T = any>(
   path: string,
   options: AxiosRequestConfig = {}
 ): Promise<T> {
-  const token = getToken();
+  const token = useAuthStore.getState().token ?? localStorage.getItem("token");
 
-  // Không ép kiểu AxiosRequestHeaders, để Axios tự xử lý
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string> || {}),
   };
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   try {
     const response = await axios({
@@ -26,11 +24,12 @@ export async function fetcher<T = any>(
       headers,
       ...options,
     });
-
     return response.data;
   } catch (err: any) {
     if (err.response?.status === 401 || err.response?.status === 403) {
       removeToken();
+      useAuthStore.getState().logout();
+      console.warn("Token invalid or expired, removed from storage.");
     }
     console.error("API Error:", err.response?.data || err.message || err);
     throw err;

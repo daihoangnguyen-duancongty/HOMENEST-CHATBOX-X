@@ -1,8 +1,10 @@
 'use client';
 
 import Sidebar from "@/components/Sidebar";
-import { fetcher } from "@/config/fetcher";
+import Header from '@/components/Header';
 import { useEffect, useState } from "react";
+import type {DashboardStats} from '@/types/admin'
+import {  getDashboardStats } from "@/api/admin";
 import {
   PieChart,
   Pie,
@@ -12,20 +14,13 @@ import {
   Legend,
 } from "recharts";
 
-type DashboardStats = {
-  totalClients: number;
-  activeClients: number;
-  trialClients: number;
-  totalUsers: number;
-};
-
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await fetcher<DashboardStats>("/admin/dashboard");
+        const data = await getDashboardStats();
         setStats(data);
       } catch (err) {
         console.error(err);
@@ -36,40 +31,43 @@ export default function AdminDashboard() {
 
   const pieData = stats
     ? [
-        { name: "Active", value: stats.activeClients },
-        { name: "Trial", value: stats.trialClients },
+        { name: "Active Clients", value: stats.activeClients },
+        { name: "Trial Clients", value: stats.trialClients },
       ]
     : [];
 
   const COLORS = ["#0b74ff", "#facc15"];
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="flex-1 p-8 bg-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+       <Header />
+      <main className="flex-1 p-8">
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded shadow">
-            <p>Total Clients</p>
-            <p>{stats?.totalClients ?? "..."}</p>
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <p className="text-gray-500 font-medium">Total Clients</p>
+            <p className="text-2xl font-bold mt-2">{stats?.totalClients}</p>
           </div>
-          <div className="bg-white p-6 rounded shadow">
-            <p>Active Clients</p>
-            <p>{stats?.activeClients ?? "..."}</p>
+          <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <p className="text-gray-500 font-medium">Active Clients</p>
+            <p className="text-2xl font-bold mt-2">{stats?.activeClients}</p>
           </div>
-          <div className="bg-white p-6 rounded shadow">
-            <p>Trial Clients</p>
-            <p>{stats?.trialClients ?? "..."}</p>
+          <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <p className="text-gray-500 font-medium">Trial Clients</p>
+            <p className="text-2xl font-bold mt-2">{stats?.trialClients}</p>
           </div>
-          <div className="bg-white p-6 rounded shadow">
-            <p>Total Users</p>
-            <p>{stats?.totalUsers ?? "..."}</p>
+          <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <p className="text-gray-500 font-medium">Total Users</p>
+            <p className="text-2xl font-bold mt-2">{stats?.totalUsers}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded shadow h-96">
-          <h2>Client Status</h2>
+        {/* Pie Chart */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 h-96">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">Client Status</h2>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -78,19 +76,23 @@ export default function AdminDashboard() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
-                label
+                outerRadius={90}
+                label={(entry) => `${entry.name}: ${entry.value}`}
+                paddingAngle={4}
               >
                 {pieData.map((_, idx) => (
                   <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip
+                formatter={(value: number) => [`${value}`, "Clients"]}
+                contentStyle={{ backgroundColor: "#f9f9f9", borderRadius: 10 }}
+              />
+              <Legend verticalAlign="bottom" height={36} />
             </PieChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

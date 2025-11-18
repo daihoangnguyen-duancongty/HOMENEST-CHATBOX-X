@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
+import { useRouter } from 'next/navigation';
 
 export default function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
+  const router = useRouter();
 
   const handleLogout = () => {
-    logout(); // Xóa token + user
+    logout();          // Xóa token + user
+    router.push('/auth/login'); // Redirect về login
   };
 
   return (

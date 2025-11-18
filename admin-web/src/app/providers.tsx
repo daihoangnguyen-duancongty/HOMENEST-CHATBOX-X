@@ -1,18 +1,11 @@
-"use client";
+'use client';
 
 import { ReactNode, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuthStore } from "@/store/auth";
 
 const queryClient = new QueryClient();
 
 export const Providers = ({ children }: { children: ReactNode }) => {
-  const loadFromStorage = useAuthStore((s) => s.loadFromStorage);
-
-  // Load token + user từ localStorage
-  useEffect(() => {
-    loadFromStorage();
-  }, [loadFromStorage]);
 
   return (
     <QueryClientProvider client={queryClient}>

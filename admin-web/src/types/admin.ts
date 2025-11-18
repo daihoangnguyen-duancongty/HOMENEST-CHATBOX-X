@@ -8,3 +8,9 @@ export type LoginFormInputs = {
   username: string;
   password: string;
 };
+export type DashboardStats = {
+  totalClients: number;
+  activeClients: number;
+  trialClients: number;
+  totalUsers: number;
+};
