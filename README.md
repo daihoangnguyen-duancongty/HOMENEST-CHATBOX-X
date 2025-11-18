@@ -125,6 +125,9 @@ Body:
 
 ✅ 1. KIẾN TRÚC TỔNG QUAN
 
+
+PROJECT 1: BACKEND
+
 backend/
 ├─ graphql/
 │ ├─ schema.ts
@@ -141,24 +144,85 @@ backend/
 ├─ package.json
 └─ tsconfig.json
 
-/dashboard/src/app/
-├─ admin/
-│  ├─ clients/
-│  │  └─ page.tsx
-│  ├─ users/
-│  │  └─ page.tsx
-│  ├─ plans/
-│  │  └─ page.tsx
-│  └─ page.tsx           <-- Admin dashboard home
-├─ client/
-│  ├─ employees/
-│  │  └─ page.tsx
-│  ├─ profile/
-│  │  └─ page.tsx
-│  ├─ api-keys/
-│  │  └─ page.tsx
-│  └─ subscription/
-│     └─ page.tsx
-├─ login/
-│  └─ page.tsx
-└─ page.tsx               <-- root page, redirect / → /login
+
+
+PROJECT 2: ADMIN-WEB
+
+admin-web/
+└─ src/
+   └─ app/
+      ├─ login/
+      │   └─ page.tsx              ← Admin login
+      │
+      ├─ dashboard/                ← Private admin area
+      │   ├─ page.tsx              ← Admin home
+      │   ├─ clients/
+      │   │   └─ page.tsx          ← Quản lý client
+      │   ├─ users/
+      │   │   └─ page.tsx          ← Quản lý admin/user
+      │   ├─ plans/
+      │   │   └─ page.tsx          ← Quản lý gói dịch vụ
+      │   └─ settings/
+      │       └─ page.tsx          ← System settings
+      │
+      ├─ api/
+      │   └─ route.ts              ← Next.js API routes (nếu cần)
+      │
+      ├─ graphql/
+      │   ├─ client.ts
+      │   ├─ mutations.ts
+      │   └─ queries.ts
+      │
+      ├─ layout.tsx
+      ├─ provider.tsx
+      └─ page.tsx                  ← redirect("/") → "/login"
+
+
+PROJECT 3: CLIENT-WEB
+
+
+
+client-web/
+└─ src/
+   └─ app/
+      ├─ login/
+      │   └─ page.tsx              ← Trang đăng nhập
+      │
+      ├─ dashboard/                ← Tất cả giao diện khi đã login
+      │   ├─ page.tsx              ← Dashboard Home
+      │   ├─ employees/
+      │   │   └─ page.tsx
+      │   ├─ api-keys/
+      │   │   └─ page.tsx
+      │   ├─ profile/
+      │   │   └─ page.tsx
+      │   ├─ subscription/
+      │       └─ page.tsx
+      │
+      ├─ plugin/
+      │   └─ page.tsx              ← UI iframe chạy trong website khách
+      │
+      ├─ api/
+      │   └─ route.ts              ← Nếu có Next.js API routes
+      │
+      ├─ graphql/
+      │   ├─ client.ts             ← GraphQL client
+      │   ├─ mutations.ts
+      │   └─ queries.ts
+      │
+      ├─ layout.tsx                ← Layout gốc
+      ├─ provider.tsx              ← Context provider
+      └─ page.tsx                  ← redirect("/") → "/login"
+
+
+
+
+
+
+
+
+
+
+
+
+
