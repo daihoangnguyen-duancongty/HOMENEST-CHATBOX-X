@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ClientModel } from '../models/Client';
+import { UserModel } from '../models/User';
 import { ClientLogModel } from '../models/ClientLog';
 import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
 
@@ -176,4 +177,23 @@ export default class AdminController {
     await SubscriptionPlanModel.findByIdAndDelete(req.params.id);
     return res.json({ ok: true });
   }
+  // GET DASHBOARD STATS
+static async getDashboard(req: Request, res: Response) {
+  try {
+    const totalClients = await ClientModel.countDocuments();
+    const activeClients = await ClientModel.countDocuments({ active: true });
+    const trialClients = await ClientModel.countDocuments({ active: true, trial: true });
+    const totalUsers = await UserModel.countDocuments();
+
+    return res.json({
+      totalClients,
+      activeClients,
+      trialClients,
+      totalUsers,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
 }

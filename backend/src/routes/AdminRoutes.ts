@@ -22,5 +22,7 @@ router.get('/plans', adminAuth, AdminController.getPlans);
 router.post('/plans', adminAuth, AdminController.createPlan);
 router.put('/plans/:id', adminAuth, AdminController.updatePlan);
 router.delete('/plans/:id', adminAuth, AdminController.deletePlan);
+// stats
+router.get('/dashboard', adminAuth, AdminController.getDashboard);
 
 export default router;

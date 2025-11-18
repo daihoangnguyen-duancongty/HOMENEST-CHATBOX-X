@@ -9,9 +9,10 @@ const queryClient = new QueryClient();
 export const Providers = ({ children }: { children: ReactNode }) => {
   const loadFromStorage = useAuthStore((s) => s.loadFromStorage);
 
+  // Load token + user từ localStorage
   useEffect(() => {
     loadFromStorage();
-  }, []);
+  }, [loadFromStorage]);
 
   return (
     <QueryClientProvider client={queryClient}>
