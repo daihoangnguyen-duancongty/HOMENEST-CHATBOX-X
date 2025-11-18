@@ -217,7 +217,17 @@ client-web/
 
 
 
+✅ 2. TEST
 
+Admin Homenest
+
+TK2:
+
+User: superadmin2
+Pass: 123457
+
+
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbi0xNzYzNDM3NTg0MzA1IiwidXNlcm5hbWUiOiJzdXBlcmFkbWluMiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MzQzNzc2NSwiZXhwIjoxNzY0MDQyNTY1fQ.0VNDtuZvJzf02MBKXRCgHuYWbiciyM5qhLTJStZ5irA
 
 
 
