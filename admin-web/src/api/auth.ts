@@ -1,27 +1,44 @@
+"use client";
+
 import { fetcher } from "@/config/fetcher";
 import { setToken } from "@/config/token";
-import { useAuthStore } from "@/store/auth";
-import type { AdminAuthData } from "@/types/admin";
 
-export async function loginAdmin({ username, password }: { username: string; password: string }) {
-  const res = await fetcher<{ ok: boolean; token?: string }>("/auth/login", {
+export async function loginAdmin({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}) {
+  // Gửi request login tới server
+  const res = await fetcher<{
+    ok: boolean;
+    token?: string;
+    error?: string;
+  }>("/auth/login", {
     method: "POST",
     data: { username, password },
   });
 
   if (!res.ok || !res.token) {
-    throw new Error("Login failed: " + JSON.stringify(res));
+    throw new Error(res.error || "Login failed");
   }
 
-  // Lưu token trực tiếp vào localStorage
-  setToken(res.token);
+  // Lưu token vào localStorage trực tiếp (Zustand sẽ đọc từ đây)
+  // setToken(res.token);
 
   return res.token;
 }
-export async function registerAdmin({ username, password, name, avatar }: AdminAuthData) {
-  const res = await fetcher("/auth/register", {
+
+export async function registerAdmin(payload: {
+  username: string;
+  password: string;
+  name?: string;
+  avatar?: string;
+}) {
+  const res = await fetcher<{ ok: boolean; token?: string }>("/auth/register", {
     method: "POST",
-    data: { username, password, name, avatar },
+    data: payload,
   });
 
   if (res.ok && res.token) {

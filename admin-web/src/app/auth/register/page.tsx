@@ -5,13 +5,8 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerAdmin } from "./../../../api/auth";
 import { useRouter } from "next/navigation";
+import {RegisterFormInputs} from '@/types/admin'
 
-type RegisterFormInputs = {
-  username: string;
-  password: string;
-  name: string;
-  avatar?: string;
-};
 
 const registerSchema = Yup.object().shape({
   username: Yup.string().required("Username is required"),
@@ -26,15 +21,16 @@ export default function RegisterPage() {
     resolver: yupResolver(registerSchema),
   });
 
-  const onSubmit = async (data: RegisterFormInputs) => {
-    try {
-      const res = await registerAdmin(data);
-      if (res.ok) router.push("/admin/dashboard");
-      else alert(res.error || "Register failed");
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Register error");
-    }
-  };
+ const onSubmit = async (data: RegisterFormInputs): Promise<void> => {
+  try {
+    const res = await registerAdmin(data);
+    if (res.ok) router.push("/admin/dashboard");
+    else alert(res.error || "Register failed");
+  } catch (err: unknown) {
+    alert(err instanceof Error ? err.message : "Register error");
+  }
+};
+
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">

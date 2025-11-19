@@ -44,6 +44,8 @@ router.post("/register", async (req, res) => {
       userId: admin.userId,
       username: admin.username,
       role: admin.role,
+        avatar: admin.avatar,   
+  name: admin.name       
     }, JWT_SECRET, { expiresIn: "7d" });
 
     return res.json({
