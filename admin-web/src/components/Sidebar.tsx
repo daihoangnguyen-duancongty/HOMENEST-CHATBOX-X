@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore } from '@/store/authSlice';
 import { useRouter } from 'next/navigation';
 
 export default function Sidebar() {

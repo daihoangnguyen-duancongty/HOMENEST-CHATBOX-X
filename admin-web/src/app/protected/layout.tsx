@@ -1,27 +1,21 @@
 "use client";
 
-import { ReactNode } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth";
-import { decodeToken } from "@/config/token";
+import { useAuthStore } from "@/store/authSlice";
+import { getToken } from "@/config/token";
 
-export default function ProtectedLayout({ children }: { children: ReactNode }) {
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const token = useAuthStore((state) => state.token);
-  const rehydrated = useAuthStore((state) => state.rehydrated);
+  const { token, logout } = useAuthStore();
 
-  if (!rehydrated) return null;
-
-  if (!token) {
-    router.replace("/auth/login");
-    return null;
-  }
-
-  const decoded = decodeToken(token);
-  if (!decoded) {
-    router.replace("/auth/login");
-    return null;
-  }
+  useEffect(() => {
+    const storedToken = token || getToken();
+    if (!storedToken) {
+      logout();
+      router.replace("/auth/login");
+    }
+  }, [token, logout, router]);
 
   return <>{children}</>;
 }

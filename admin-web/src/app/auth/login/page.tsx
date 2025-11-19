@@ -1,71 +1,39 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { loginAdmin } from "@/api/auth";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth";
-import { decodeToken } from "@/config/token";
-
-type LoginFormInputs = { username: string; password: string };
-
-const loginSchema = Yup.object().shape({
-  username: Yup.string().required("Username is required"),
-  password: Yup.string().required("Password is required"),
-});
+import { loginAdmin } from "@/api/auth";
+import { useAuthStore } from "@/store/authSlice";
 
 export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
-  const loginWithToken = useAuthStore((s) => s.loginWithToken);
+  const { login } = useAuthStore();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>({
-    resolver: yupResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginFormInputs) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const token = await loginAdmin(data);
-      loginWithToken(token);
+      // Gọi API login
+      const { token, user } = await loginAdmin({ username, password });
+       console.log("he")
+      // Lưu token + user vào Zustand store
+      login(token, user);
 
-      const decoded = decodeToken(token);
-      if (!decoded) return alert("Cannot read user from token");
-
-      if (decoded.role === "admin") router.push("/protected/dashboard");
-      else router.push("/");
-
+      // Redirect sang dashboard
+      router.push("/protected/dashboard");
     } catch (err: any) {
-      alert(err.message || "Login error");
+      setError(err.message || "Login failed");
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
-
-        <input
-          {...register("username")}
-          placeholder="Username"
-          className={`w-full p-2 mb-2 border rounded ${errors.username ? "border-red-500" : ""}`}
-        />
-        {errors.username && <p className="text-red-500 mb-2 text-sm">{errors.username.message}</p>}
-
-        <input
-          {...register("password")}
-          type="password"
-          placeholder="Password"
-          className={`w-full p-2 mb-2 border rounded ${errors.password ? "border-red-500" : ""}`}
-        />
-        {errors.password && <p className="text-red-500 mb-2 text-sm">{errors.password.message}</p>}
-
-        <button
-          type="submit"
-          className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          Login
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+      <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
+      <button type="submit">Login</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </form>
   );
 }

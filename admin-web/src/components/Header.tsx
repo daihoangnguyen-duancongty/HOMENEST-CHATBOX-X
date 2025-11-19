@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 "use client";
 
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/authSlice";
 import { useRouter } from "next/navigation";
 
 export default function Header() {

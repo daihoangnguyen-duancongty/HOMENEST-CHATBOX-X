@@ -149,33 +149,21 @@ backend/
 PROJECT 2: ADMIN-WEB
 
 admin-web/
-└─ src/
-   └─ app/
-      ├─ login/
-      │   └─ page.tsx              ← Admin login
-      │
-      ├─ dashboard/                ← Private admin area
-      │   ├─ page.tsx              ← Admin home
-      │   ├─ clients/
-      │   │   └─ page.tsx          ← Quản lý client
-      │   ├─ users/
-      │   │   └─ page.tsx          ← Quản lý admin/user
-      │   ├─ plans/
-      │   │   └─ page.tsx          ← Quản lý gói dịch vụ
-      │   └─ settings/
-      │       └─ page.tsx          ← System settings
-      │
-      ├─ api/
-      │   └─ route.ts              ← Next.js API routes (nếu cần)
-      │
-      ├─ graphql/
-      │   ├─ client.ts
-      │   ├─ mutations.ts
-      │   └─ queries.ts
-      │
-      ├─ layout.tsx
-      ├─ provider.tsx
-      └─ page.tsx                  ← redirect("/") → "/login"
+├─ app/
+│  ├─ layout.tsx
+│  ├─ page.tsx                <-- redirect sang login
+│  ├─ auth/
+│  │  ├─ login/page.tsx
+│  │  └─ register/page.tsx
+│  ├─ protected/
+│  │  ├─ layout.tsx           <-- ProtectedLayout
+│  │  ├─ dashboard/page.tsx
+│  │  └─ clients/page.tsx
+├─ src/
+│  ├─ store/authSlice.ts
+│  ├─ config/fetcher.ts
+│  ├─ config/token.ts
+│  └─ providers.ts
 
 
 PROJECT 3: CLIENT-WEB

@@ -2,7 +2,7 @@
 "use client";
 
 import axios, { AxiosRequestConfig } from "axios";
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/authSlice";
 import { removeToken } from "@/config/token";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "";
