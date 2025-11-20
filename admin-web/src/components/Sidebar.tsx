@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authSlice';
 import { useRouter } from 'next/navigation';
+import Account from "@/components/Account";
 
 export default function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
@@ -15,25 +16,25 @@ export default function Sidebar() {
 
   return (
     <nav className="flex flex-col h-screen w-64 bg-gray-800 text-white p-4">
-      <h1 className="text-2xl font-bold mb-6">Admin Panel</h1>
+      <h1 className="text-2xl font-bold mb-6">Chatbot X Admin</h1>
       <ul className="space-y-2">
         <li>
-          <Link href="/admin/dashboard" className="hover:bg-gray-700 p-2 rounded block">
-            Dashboard
+          <Link href="/protected/dashboard" className="hover:bg-gray-700 p-2 rounded block">
+            Trang chủ
           </Link>
         </li>
         <li>
-          <Link href="/admin/clients" className="hover:bg-gray-700 p-2 rounded block">
-            Clients
+          <Link href="/protected/dashboard/clients" className="hover:bg-gray-700 p-2 rounded block">
+            Khách hàng
           </Link>
         </li>
         <li>
-          <Link href="/admin/subscriptions" className="hover:bg-gray-700 p-2 rounded block">
-            Subscription Plans
+          <Link href="/protected/dashboard/subscriptions" className="hover:bg-gray-700 p-2 rounded block">
+            Gói sản phẩm
           </Link>
         </li>
         <li>
-          <Link href="/admin/apikeys" className="hover:bg-gray-700 p-2 rounded block">
+          <Link href="/protected/dashboard/apikeys" className="hover:bg-gray-700 p-2 rounded block">
             API Keys
           </Link>
         </li>
@@ -42,10 +43,16 @@ export default function Sidebar() {
             onClick={handleLogout}
             className="w-full text-left hover:bg-gray-700 p-2 rounded block"
           >
-            Logout
+            Đăng xuất
           </button>
+           
         </li>
+      
       </ul>
+        {/* ⭐ Đẩy Account xuống đáy */}
+      <div className="mt-auto pt-4">
+        <Account />
+      </div>
     </nav>
   );
 }

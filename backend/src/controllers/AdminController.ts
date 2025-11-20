@@ -153,7 +153,29 @@ export default class AdminController {
       return res.status(500).json({ error: err.message });
     }
   }
+// DEACTIVATE CLIENT
+static async deactivateClient(req: Request, res: Response) {
+  try {
+    const { clientId } = req.body;
 
+    const client = await ClientModel.findOne({ clientId });
+    if (!client) return res.status(404).json({ error: 'Client not found' });
+
+    client.active = false;
+    await client.save();
+
+    // Tạo log hành động
+    await ClientLogModel.create({
+      clientId,
+      action: 'deactivate',
+      description: 'Client has been deactivated',
+    });
+
+    return res.json({ ok: true, client });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+}
   // =========================
   // CRUD Plans
   // =========================

@@ -14,9 +14,9 @@ router.post('/clients', adminAuth, AdminController.createClient);
 router.put('/clients/:clientId', adminAuth, AdminController.updateClient);
 router.delete('/clients/:clientId', adminAuth, AdminController.deleteClient);
 
-// Reactivate
+// Khóa client
 router.post('/clients/reactivate', adminAuth, AdminController.reactivateClient);
-
+router.post('/clients/deactivate', adminAuth, AdminController.deactivateClient);
 // Plans CRUD
 router.get('/plans', adminAuth, AdminController.getPlans);
 router.post('/plans', adminAuth, AdminController.createPlan);
