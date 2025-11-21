@@ -54,23 +54,38 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
     return `client_demo_${max + 1}`;
   };
 
-  const handleFormSubmit = (data: FormValues) => {
-    let parsedMeta: Record<string, any> | undefined;
-    try {
-      parsedMeta = data.meta ? JSON.parse(data.meta) : undefined;
-    } catch (e) {
-      alert('Meta phải là JSON hợp lệ!');
-      return;
-    }
+const handleFormSubmit = (data: FormValues) => {
+  let parsedMeta: Record<string, any> | undefined;
 
-    const newClientId = client?.clientId || generateClientId();
-    const payload: Partial<IClient> = {
-      clientId: newClientId,
-      ...data,
-      meta: parsedMeta,
-    };
-    onSubmit(payload);
-  };
+  if (data.meta && data.meta.trim() !== "") {
+    const metaStr = data.meta.trim();
+
+    // 1) Nếu người dùng nhập JSON → parse bình thường
+    if (metaStr.startsWith("{")) {
+      try {
+        parsedMeta = JSON.parse(metaStr);
+      } catch (e) {
+        alert("Meta phải là JSON hợp lệ!");
+        return;
+      }
+    } 
+    // 2) Nếu người dùng chỉ nhập API key → tự convert JSON
+    else {
+      parsedMeta = { openai: metaStr };
+    }
+  }
+
+  const newClientId = client?.clientId || generateClientId();
+
+const payload: Partial<IClient> = {
+  clientId: newClientId,
+  ...data,
+  meta: parsedMeta,
+  api_keys: parsedMeta ? { openai: parsedMeta.openai } : {},
+};
+  onSubmit(payload);
+};
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -80,23 +95,23 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
       >
         <h2 className="text-xl font-bold">{client ? 'Chỉnh sửa thông tin khách hàng' : 'Tạo khách hàng mới'}</h2>
 
-        <div className="flex flex-col gap-1">
+        {/* <div className="flex flex-col gap-1">
           <label>Client ID</label>
           <input
             value={client?.clientId || generateClientId()}
             disabled
             className="p-2 rounded bg-gray-800 text-white"
           />
-        </div>
+        </div> */}
 
         <div className="flex flex-col gap-1">
-          <label>Username</label>
+          <label>Tên người dùng HomNest</label>
           <input {...register('username')} className="p-2 rounded bg-gray-800 text-white" />
           {errors.username && <span className="text-red-400">{errors.username.message}</span>}
         </div>
 
         <div className="flex flex-col gap-1">
-          <label>Name</label>
+          <label>Tên người dùng</label>
           <input {...register('name')} className="p-2 rounded bg-gray-800 text-white" />
           {errors.name && <span className="text-red-400">{errors.name.message}</span>}
         </div>
@@ -114,7 +129,7 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
         </div>
 
         <div className="flex flex-col gap-1">
-          <label>AI Provider</label>
+          <label>Nền tảng AI</label>
           <select {...register('ai_provider')} className="p-2 rounded bg-gray-800 text-white">
             <option value="openai">OpenAI</option>
             <option value="claude">Claude</option>
@@ -123,19 +138,19 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
           {errors.ai_provider && <span className="text-red-400">{errors.ai_provider.message}</span>}
         </div>
 
-        <div className="flex flex-col gap-1">
+        {/* <div className="flex flex-col gap-1">
           <label>User Count</label>
           <input type="number" {...register('user_count')} className="p-2 rounded bg-gray-800 text-white" />
           {errors.user_count && <span className="text-red-400">{errors.user_count.message}</span>}
-        </div>
+        </div> */}
 
         <div className="flex flex-col gap-1">
-          <label>Meta (JSON, optional)</label>
+          <label>API key AI (JSON, optional)</label>
           <textarea {...register('meta')} className="p-2 rounded bg-gray-800 text-white h-24" />
         </div>
 
         <div className="flex justify-end gap-2 mt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 transition">Cancel</button>
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 transition">Hủy</button>
           <button type="submit" className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition">{client ? 'Cập nhật' : 'Tạo mới'}</button>
         </div>
       </form>

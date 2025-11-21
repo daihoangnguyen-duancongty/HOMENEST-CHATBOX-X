@@ -4,6 +4,7 @@ import { IClient } from "@/types/admin";
 import ConfirmModal from "./ConfirmModal";
 import Toast from "./Toast";
 import ToggleSwitch from "./ToggleSwitch";
+import { Edit, Trash } from "lucide-react";
 
 interface Props {
   clients: IClient[];
@@ -57,27 +58,39 @@ const handleDeactivate = async (clientId: string) => {
         <table className="w-full table-auto text-gray-600">
           <thead>
             <tr className="text-left border-b border-white/20">
-              <th className="px-4 py-2">Client ID</th>
-              <th className="px-4 py-2">Avatar</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Users</th>
-              <th className="px-4 py-2">Active</th>
-              <th className="px-4 py-2">Trial End</th>
-              <th className="px-4 py-2">Actions</th>
+              {/* <th className="px-4 py-2">Client ID</th> */}
+              <th className="px-4 py-2">Ảnh đại diện</th>
+              <th className="px-4 py-2">Tên</th>
+              <th className="px-4 py-2">Lượng người dùng</th>
+              <th className="px-4 py-2">Trạng thái</th>
+              <th className="px-4 py-2">Ngày hết hạn dùng thử</th>
+              <th className="px-4 py-2">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {clients.map(c => (
               <tr key={c.clientId} className="hover:bg-white/10 transition">
-                <td className="px-4 py-2">{c.clientId}</td>
+                {/* <td className="px-4 py-2">{c.clientId}</td> */}
                 <td className="px-4 py-2">{c.avatar}</td>
                 <td className="px-4 py-2">{c.name}</td>
                 <td className="px-4 py-2">{c.user_count}</td>
-                <td className="px-4 py-2">{c.active ? '✅' : '❌'}</td>
+                <td className="px-4 py-2">{c.active ? '✅ Đang hoạt động' : '❌ Đã khóa'}</td>
                 <td className="px-4 py-2">{c.trial_end ? new Date(c.trial_end).toLocaleDateString() : '∞'}</td>
                 <td className="px-4 py-2 flex gap-2">
-                  <button className="px-2 py-1 bg-green-600 rounded" onClick={() => onEdit(c)}>Edit</button>
-                  <button className="px-2 py-1 bg-red-600 rounded" onClick={() => setSelectedClientId(c.clientId)}>Delete</button>
+                 
+  <button
+    className="p-2 bg-green-600 hover:bg-green-700 rounded-full transition"
+    onClick={() => onEdit(c)}
+  >
+    <Edit size={16} className="text-white" />
+  </button>
+
+  <button
+    className="p-2 bg-red-600 hover:bg-red-700 rounded-full transition"
+    onClick={() => setSelectedClientId(c.clientId)}
+  >
+    <Trash size={16} className="text-white" />
+  </button>
                  <ToggleSwitch
   checked={c.active}
   loading={loadingReactivate === c.clientId}
