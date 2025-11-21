@@ -3,6 +3,7 @@ import { useState } from "react";
 import { IClient } from "@/types/admin";
 import ConfirmModal from "./ConfirmModal";
 import Toast from "./Toast";
+import ToggleSwitch from "./ToggleSwitch";
 
 interface Props {
   clients: IClient[];
@@ -77,23 +78,13 @@ const handleDeactivate = async (clientId: string) => {
                 <td className="px-4 py-2 flex gap-2">
                   <button className="px-2 py-1 bg-green-600 rounded" onClick={() => onEdit(c)}>Edit</button>
                   <button className="px-2 py-1 bg-red-600 rounded" onClick={() => setSelectedClientId(c.clientId)}>Delete</button>
-                 {c.active ? (
-  <button
-    className="px-2 py-1 bg-gray-500 rounded"
-    onClick={() => handleDeactivate(c.clientId)}
-    disabled={loadingReactivate === c.clientId}
-  >
-    {loadingReactivate === c.clientId ? "..." : "Deactivate"}
-  </button>
-) : (
-  <button
-    className="px-2 py-1 bg-orange-400 rounded"
-    onClick={() => handleReactivate(c.clientId)}
-    disabled={loadingReactivate === c.clientId}
-  >
-    {loadingReactivate === c.clientId ? "..." : "Reactivate"}
-  </button>
-)}
+                 <ToggleSwitch
+  checked={c.active}
+  loading={loadingReactivate === c.clientId}
+  onChange={() =>
+    c.active ? handleDeactivate(c.clientId) : handleReactivate(c.clientId)
+  }
+/>
 
                 </td>
               </tr>

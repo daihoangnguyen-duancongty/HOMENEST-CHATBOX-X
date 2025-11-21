@@ -4,9 +4,10 @@
 import { fetcher } from "@/config/fetcher";
 import { setToken } from "@/config/token";
 
+const ADMIN_PREFIX_STATS = "/admin-api";
 
 export async function loginAdmin({ username, password }: { username: string; password: string }) {
-  const res = await fetcher<any>("/auth/login", {
+  const res = await fetcher<any>(`${ADMIN_PREFIX_STATS}/auth/login`, {
     method: "POST",
     data: { username, password },
   });
