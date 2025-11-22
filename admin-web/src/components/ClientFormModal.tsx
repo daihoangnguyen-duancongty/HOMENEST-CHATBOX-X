@@ -33,15 +33,16 @@ type FormValues = {
 
 export default function ClientFormModal({ clients, client, onClose }: Props) {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
-    defaultValues: {
-      username: client?.username || '',
-      name: client?.name || '',
-      password: client?.password || '',
-      ai_provider: client?.ai_provider || 'openai',
-      user_count: client?.user_count || 1,
-      avatar: client?.avatar || '',
-      meta: client?.meta ? JSON.stringify(client.meta, null, 2) : '',
-    },
+ defaultValues: {
+  username: client?.username || '',
+  name: client?.name || '',
+  password: client?.password || '',
+  ai_provider: client?.ai_provider || 'openai',
+  user_count: client?.user_count || 1,
+  avatar: client?.avatar || '',
+  meta: client?.meta ? JSON.stringify(client.meta, null, 2) : '',
+},
+
     resolver: yupResolver(schema) as any,
   });
 
@@ -57,13 +58,13 @@ export default function ClientFormModal({ clients, client, onClose }: Props) {
   };
 
 const onSubmit = async (data: FormValues) => {
-  const clientId = client?.clientId || generateClientId();
+  // Nếu đang edit, lấy clientId từ client cũ
+  const clientId = client?.clientId;
 
   const formData = new FormData();
   formData.append('username', data.username);
   formData.append('name', data.name);
   formData.append('password', data.password);
-  formData.append('clientId', clientId);
   formData.append('user_count', String(data.user_count));
   formData.append('ai_provider', data.ai_provider);
   formData.append('meta', data.meta || '{}');
@@ -72,9 +73,18 @@ const onSubmit = async (data: FormValues) => {
     formData.append('avatar', fileInput.current.files[0]);
   }
 
-  await postFormData('/admin-api/clients', formData);
+  if (client) {
+    // update client
+    await postFormData(`/admin-api/clients/${clientId}`, formData, 'PATCH');
+  } else {
+    // tạo mới client
+    formData.append('clientId', generateClientId());
+    await postFormData('/admin-api/clients', formData);
+  }
+
   onClose();
 };
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -115,9 +125,14 @@ const onSubmit = async (data: FormValues) => {
             }}
             className="p-2 rounded bg-gray-800 text-white"
           />
-          {watch('avatar') && (
-            <img src={watch('avatar')} alt="avatar preview" className="w-20 h-20 rounded-lg object-cover mt-2" />
-          )}
+          {(watch('avatar') || client?.avatar) && (
+  <img
+    src={watch('avatar') || client?.avatar}
+    alt="avatar preview"
+    className="w-20 h-20 rounded-lg object-cover mt-2"
+  />
+)}
+
         </div>
 
         <div className="flex flex-col gap-1">
