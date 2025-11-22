@@ -68,14 +68,13 @@ const onSubmit = async (data: FormValues) => {
   formData.append('ai_provider', data.ai_provider);
   formData.append('meta', data.meta || '{}');
 
-{fileInput.current?.files?.[0] && (
-  <img src={URL.createObjectURL(fileInput.current.files[0])} className="w-20 h-20 rounded-lg object-cover mt-2" />
-)}
+  if (fileInput.current?.files?.[0]) {
+    formData.append('avatar', fileInput.current.files[0]);
+  }
 
   await postFormData('/admin-api/clients', formData);
   onClose();
 };
-
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">

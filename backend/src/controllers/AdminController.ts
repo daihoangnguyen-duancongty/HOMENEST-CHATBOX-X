@@ -29,14 +29,14 @@ export default class AdminController {
     }
   }
 
-  // CREATE CLIENT
+ // CREATE CLIENT
 static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
     const file = req.file;
 
-    console.log('BODY:', req.body);
-    console.log('FILE:', req.file);
+    console.log('BODY:', data);
+    console.log('FILE:', file);
 
     // 1️⃣ Upload avatar nếu có
     let avatarUrl = '';
@@ -44,10 +44,7 @@ static async createClient(req: Request, res: Response) {
       const result: UploadApiResponse = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { folder: 'homenest/homenest-chatbotx-client' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result!);
-          }
+          (error, result) => (error ? reject(error) : resolve(result!))
         );
         stream.end(file.buffer);
       });
@@ -60,25 +57,28 @@ static async createClient(req: Request, res: Response) {
       return res.status(400).json({ error: 'clientId already exists' });
     }
 
-    // 3️⃣ Tạo Client
+    // 3️⃣ Chuyển user_count sang number
+    const userCount = Number(data.user_count) || 1;
+
+    // 4️⃣ Tạo Client
     const newClient = await ClientModel.create({
       clientId: data.clientId,
       name: data.name,
       avatar: avatarUrl,
-      user_count: data.user_count,
+      user_count: userCount,
       ai_provider: data.ai_provider,
       api_keys: data.api_keys,
       meta: data.meta,
       color: data.color,
     });
 
-    // 4️⃣ Tạo User kèm userId và role hợp lệ
+    // 5️⃣ Tạo User với userId và role hợp lệ
     const user = await UserModel.create({
-      userId: uuidv4(),              // bắt buộc
+      userId: uuidv4(),
       username: data.username,
       name: data.name,
       password: data.password,
-      role: 'admin',                 // phải hợp lệ với enum schema
+      role: 'owner',           // phải hợp lệ enum schema
       clientId: data.clientId,
       avatar: avatarUrl,
     });
@@ -89,6 +89,7 @@ static async createClient(req: Request, res: Response) {
     return res.status(500).json({ error: 'Server error' });
   }
 }
+
 
   // UPDATE CLIENT
 static async updateClient(req: Request, res: Response) {
