@@ -5,6 +5,7 @@ import { ClientLogModel } from '../models/ClientLog';
 import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class AdminController {
   // GET ALL CLIENTS
@@ -30,55 +31,64 @@ export default class AdminController {
 
   // CREATE CLIENT
 static async createClient(req: Request, res: Response) {
-    try {
-      const data = req.body;
-      const file = req.file;
-console.log('BODY:', req.body);
-console.log('FILE:', req.file);
-      let avatarUrl = '';
-      if (file) {
-        const result: UploadApiResponse = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'homenest/homenest-chatbotx-client',
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result!);
-            }
-          );
-          stream.end(file.buffer);
-        });
-        avatarUrl = result.secure_url;
-      }
+  try {
+    const data = req.body;
+    const file = req.file;
 
-      const newClient = await ClientModel.create({
-        clientId: data.clientId,
-        name: data.name,
-        avatar: avatarUrl,
-        user_count: data.user_count,
-        ai_provider: data.ai_provider,
-        api_keys: data.api_keys,
-        meta: data.meta,
-        color: data.color,
+    console.log('BODY:', req.body);
+    console.log('FILE:', req.file);
+
+    // 1️⃣ Upload avatar nếu có
+    let avatarUrl = '';
+    if (file) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'homenest/homenest-chatbotx-client' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result!);
+          }
+        );
+        stream.end(file.buffer);
       });
-
-      const user = await UserModel.create({
-        username: data.username,
-        name: data.name,
-        password: data.password,
-        role: 'owner',
-        clientId: data.clientId,
-        avatar: avatarUrl,
-      });
-
-      return res.json({ ok: true, client: newClient, user });
-    } catch (err) {
-      console.error('Create client error:', err);
-      return res.status(500).json({ error: 'Server error' });
+      avatarUrl = result.secure_url;
     }
-  }
 
+    // 2️⃣ Kiểm tra trùng clientId
+    const existingClient = await ClientModel.findOne({ clientId: data.clientId });
+    if (existingClient) {
+      return res.status(400).json({ error: 'clientId already exists' });
+    }
+
+    // 3️⃣ Tạo Client
+    const newClient = await ClientModel.create({
+      clientId: data.clientId,
+      name: data.name,
+      avatar: avatarUrl,
+      user_count: data.user_count,
+      ai_provider: data.ai_provider,
+      api_keys: data.api_keys,
+      meta: data.meta,
+      color: data.color,
+    });
+
+    // 4️⃣ Tạo User kèm userId và role hợp lệ
+    const user = await UserModel.create({
+      userId: uuidv4(),              // bắt buộc
+      username: data.username,
+      name: data.name,
+      password: data.password,
+      role: 'admin',                 // phải hợp lệ với enum schema
+      clientId: data.clientId,
+      avatar: avatarUrl,
+    });
+
+    return res.json({ ok: true, client: newClient, user });
+  } catch (err) {
+    console.error('Create client error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
 
   // UPDATE CLIENT
 static async updateClient(req: Request, res: Response) {

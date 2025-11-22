@@ -15,7 +15,7 @@ const schema = yup.object({
   username: yup.string().required(),
   name: yup.string().required(),
   password: yup.string().required(),
-  avatar: yup.string().required(),
+  avatar: yup.mixed(),
   ai_provider: yup.string().oneOf(['openai','claude','gemini']).required(),
   user_count: yup.number().required().min(1),
   meta: yup.string().notRequired(),
@@ -56,25 +56,26 @@ export default function ClientFormModal({ clients, client, onClose }: Props) {
     return `client_demo_${max + 1}`;
   };
 
-  const onSubmit = async (data: FormValues) => {
-    const clientId = client?.clientId || generateClientId();
+const onSubmit = async (data: FormValues) => {
+  const clientId = client?.clientId || generateClientId();
 
-    const formData = new FormData();
-    formData.append('username', data.username);
-    formData.append('name', data.name);
-    formData.append('password', data.password);
-    formData.append('clientId', clientId);
-    formData.append('user_count', String(data.user_count));
-    formData.append('ai_provider', data.ai_provider);
-    formData.append('meta', data.meta || '{}');
+  const formData = new FormData();
+  formData.append('username', data.username);
+  formData.append('name', data.name);
+  formData.append('password', data.password);
+  formData.append('clientId', clientId);
+  formData.append('user_count', String(data.user_count));
+  formData.append('ai_provider', data.ai_provider);
+  formData.append('meta', data.meta || '{}');
 
-    if (fileInput.current?.files?.[0]) {
-      formData.append('avatar', fileInput.current.files[0]);
-    }
+{fileInput.current?.files?.[0] && (
+  <img src={URL.createObjectURL(fileInput.current.files[0])} className="w-20 h-20 rounded-lg object-cover mt-2" />
+)}
 
-    await postFormData('/admin-api/clients', formData);
-    onClose();
-  };
+  await postFormData('/admin-api/clients', formData);
+  onClose();
+};
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
