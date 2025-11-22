@@ -41,12 +41,12 @@ static async createClient(req: Request, res: Response) {
     if (exists) return res.status(400).json({ error: 'ClientId exists' });
 
     // 🔹 Bước 2: tạo client và log document vừa tạo
-    const client = await ClientModel.create({
-      ...data,
-      avatar: typeof data.avatar === "string" && data.avatar.trim() !== "" ? data.avatar : "",
-      trial_end: null,
-      user_count: data.user_count ?? 0,
-    });
+const client = await ClientModel.create({
+  ...data,
+  trial_end: null,
+  user_count: data.user_count ?? 0,
+});
+
 
     console.log("Client vừa tạo:", client);
 
