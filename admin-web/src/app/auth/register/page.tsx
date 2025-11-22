@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetcher } from "@/config/fetcher";
+import { uploadToCloudinary } from "@/config/cloudinary";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -10,19 +11,30 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+const [avatarFile, setAvatarFile] = useState<File | null>(null);
+ 
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await fetcher("/auth/register", {
-        method: "POST",
-        data: { username, password, name },
-      });
-      router.push("/auth/login");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Register failed");
+const handleRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  try {
+    let avatarUrl = null;
+
+    if (avatarFile) {
+      avatarUrl = await uploadToCloudinary(avatarFile);
     }
-  };
+
+    await fetcher("/auth/register", {
+      method: "POST",
+      data: { username, password, name, avatar: avatarUrl },
+    });
+
+    router.push("/auth/login");
+  } catch (err: any) {
+    setError(err?.response?.data?.message || "Register failed");
+  }
+};
 
   const handleLogin = () => {
     router.push("/auth/login");
@@ -36,6 +48,13 @@ export default function RegisterPage() {
         </h1>
 
         <form onSubmit={handleRegister} className="flex flex-col space-y-4">
+          <input
+  type="file"
+  accept="image/*"
+  className="px-4 py-3 rounded-xl bg-white/80 border border-white/50"
+  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+/>
+
           <input
             className="px-4 py-3 rounded-xl bg-white/80 focus:bg-white border border-white/50 outline-none focus:ring-2 focus:ring-pink-400 transition"
             value={name}

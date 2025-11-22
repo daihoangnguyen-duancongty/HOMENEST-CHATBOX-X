@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { IClient } from '@/types/admin';
+import { uploadToCloudinary } from "@/config/cloudinary";
 
 interface Props {
   clients: IClient[]; // danh sách khách hàng hiện có
@@ -31,7 +32,8 @@ type FormValues = {
 };
 
 export default function ClientFormModal({ clients, client, onSubmit, onClose }: Props) {
- const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+ const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormValues>({
+
   defaultValues: {
     username: client?.username || '',
     name: client?.name || '',
@@ -105,7 +107,7 @@ const payload: Partial<IClient> = {
         </div> */}
 
         <div className="flex flex-col gap-1">
-          <label>Tên người dùng HomNest</label>
+          <label>Tên người dùng HomeNest</label>
           <input {...register('username')} className="p-2 rounded bg-gray-800 text-white" />
           {errors.username && <span className="text-red-400">{errors.username.message}</span>}
         </div>
@@ -122,11 +124,48 @@ const payload: Partial<IClient> = {
           {errors.password && <span className="text-red-400">{errors.password.message}</span>}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label>Avatar URL</label>
-          <input {...register('avatar')} className="p-2 rounded bg-gray-800 text-white" />
-          {errors.avatar && <span className="text-red-400">{errors.avatar.message}</span>}
-        </div>
+        {/* Upload Avatar + Preview */}
+<div className="flex flex-col gap-2">
+  <label>Avatar</label>
+
+  {/* Input chọn file */}
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Upload lên Cloudinary
+      const url = await uploadToCloudinary(file);
+
+      // Gán vào field 'avatar'
+      setValue("avatar", url, { shouldValidate: true });
+    }}
+    className="p-2 rounded bg-gray-800 text-white"
+  />
+
+  {/* Preview ảnh (bằng avatar từ react-hook-form) */}
+  {watch("avatar") && (
+    <img
+      src={watch("avatar")}
+      alt="avatar preview"
+      className="w-20 h-20 rounded-lg object-cover mt-2"
+    />
+  )}
+
+  {errors.avatar && (
+    <span className="text-red-400">{errors.avatar.message}</span>
+  )}
+
+  {/* Input text để xem/đổi URL nếu muốn */}
+  <input
+    {...register("avatar")}
+    className="p-2 rounded bg-gray-800 text-white"
+    placeholder="Hoặc dán URL ảnh"
+  />
+</div>
+
 
         <div className="flex flex-col gap-1">
           <label>Nền tảng AI</label>

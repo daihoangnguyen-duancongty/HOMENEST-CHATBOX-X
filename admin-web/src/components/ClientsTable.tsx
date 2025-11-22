@@ -71,7 +71,13 @@ const handleDeactivate = async (clientId: string) => {
             {clients.map(c => (
               <tr key={c.clientId} className="hover:bg-white/10 transition">
                 {/* <td className="px-4 py-2">{c.clientId}</td> */}
-                <td className="px-4 py-2">{c.avatar}</td>
+                <td className="px-4 py-2">
+  {c.avatar ? (
+    <img src={c.avatar} className="w-10 h-10 rounded-full object-cover" />
+  ) : (
+    <div className="w-10 h-10 rounded-full bg-gray-300" />
+  )}
+</td>
                 <td className="px-4 py-2">{c.name}</td>
                 <td className="px-4 py-2">{c.user_count}</td>
                 <td className="px-4 py-2">{c.active ? '✅ Đang hoạt động' : '❌ Đã khóa'}</td>

@@ -8,7 +8,7 @@ import ClientFormModal from '@/components/ClientFormModal';
 export default function AdminClientsPage() {
   
 const { query, create, update, remove, reactivate, deactivate } = useClients();
-
+// console.log(query)
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const handleEdit = (client: any) => {

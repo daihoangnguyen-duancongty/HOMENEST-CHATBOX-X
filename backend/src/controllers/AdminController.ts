@@ -27,49 +27,49 @@ export default class AdminController {
   }
 
   // CREATE CLIENT
-  static async createClient(req: Request, res: Response) {
-    try {
-      const data = req.body;
+ static async createClient(req: Request, res: Response) {
+  try {
+    const data = req.body;
 
-      if (!data.clientId || !data.name)
-        return res.status(400).json({ error: 'clientId & name are required' });
+    if (!data.clientId || !data.name)
+      return res.status(400).json({ error: 'clientId & name are required' });
 
-      const exists = await ClientModel.findOne({ clientId: data.clientId });
-      if (exists) return res.status(400).json({ error: 'ClientId exists' });
+    const exists = await ClientModel.findOne({ clientId: data.clientId });
+    if (exists) return res.status(400).json({ error: 'ClientId exists' });
 
-      const trialEnd = new Date();
-      trialEnd.setMonth(trialEnd.getMonth() + 2);
+    const trialEnd = new Date();
+    trialEnd.setMonth(trialEnd.getMonth() + 2);
 
-      const client = await ClientModel.create({
-        ...data,
-        // trial_end: trialEnd,
-        trial_end: null, // vĩnh viễn
-        user_count: data.user_count ?? 0, // đảm bảo không undefined
-      });
+    const client = await ClientModel.create({
+      ...data,
+      avatar: data.avatar || "", // <-- THÊM DÒNG NÀY
+      trial_end: null, // vĩnh viễn
+      user_count: data.user_count ?? 0,
+    });
 
-      return res.json({ ok: true, client });
-    } catch (err: any) {
-      return res.status(500).json({ error: err.message });
-    }
+    return res.json({ ok: true, client });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
   }
-
+}
   // UPDATE CLIENT
-  static async updateClient(req: Request, res: Response) {
-    try {
-      const client = await ClientModel.findOneAndUpdate(
-        { clientId: req.params.clientId },
-        req.body,
-        { new: true }
-      );
+static async updateClient(req: Request, res: Response) {
+  try {
+    const updateData = { ...req.body };
 
-      if (!client) return res.status(404).json({ error: 'Client not found' });
+    const client = await ClientModel.findOneAndUpdate(
+      { clientId: req.params.clientId },
+      updateData,
+      { new: true }
+    );
 
-      return res.json({ ok: true, client });
-    } catch (err) {
-      return res.status(500).json({ error: 'Server error' });
-    }
+    if (!client) return res.status(404).json({ error: 'Client not found' });
+
+    return res.json({ ok: true, client });
+  } catch (err) {
+    return res.status(500).json({ error: 'Server error' });
   }
-
+}
   // DELETE CLIENT
   static async deleteClient(req: Request, res: Response) {
     try {

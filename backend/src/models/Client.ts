@@ -6,6 +6,7 @@ export interface IClient extends Document {
   domain?: string;
   color?: string;
   logo_url?: string;
+  avatar?:string;
   welcome_message?: string;
   ai_provider: string;
   user_count: number;
@@ -33,6 +34,7 @@ const ClientSchema: Schema<IClient> = new Schema({
   domain: { type: String },
   color: { type: String, default: '#0b74ff' },
   logo_url: { type: String },
+    avatar: { type: String, default: "" },
   welcome_message: { type: String, default: 'Xin chào! Mình có thể giúp gì?' },
   ai_provider: { type: String, default: 'openai' },
   api_keys: { type: Schema.Types.Mixed, default: {} },
