@@ -27,32 +27,35 @@ export default class AdminController {
   }
 
   // CREATE CLIENT
- static async createClient(req: Request, res: Response) {
+static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
- // 🔹 Log avatar để debug
-    console.log("Avatar trước khi tạo:", data.avatar, typeof data.avatar);
+
+    // 🔹 Bước 1: log payload trước khi tạo
+    console.log("Payload trước khi create:", data);
+
     if (!data.clientId || !data.name)
       return res.status(400).json({ error: 'clientId & name are required' });
 
     const exists = await ClientModel.findOne({ clientId: data.clientId });
     if (exists) return res.status(400).json({ error: 'ClientId exists' });
 
-    const trialEnd = new Date();
-    trialEnd.setMonth(trialEnd.getMonth() + 2);
-
+    // 🔹 Bước 2: tạo client và log document vừa tạo
     const client = await ClientModel.create({
       ...data,
-        avatar: typeof data.avatar === "string" && data.avatar.trim() !== "" ? data.avatar : "",
-      trial_end: null, // vĩnh viễn
+      avatar: typeof data.avatar === "string" && data.avatar.trim() !== "" ? data.avatar : "",
+      trial_end: null,
       user_count: data.user_count ?? 0,
     });
 
-    return res.json({ ok: true, client });
+    console.log("Client vừa tạo:", client);
+
+    return res.json({ ok: true, client }); // ⚠ trả về toàn bộ object client, không chỉ userId
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
 }
+
   // UPDATE CLIENT
 static async updateClient(req: Request, res: Response) {
   try {

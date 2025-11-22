@@ -56,25 +56,26 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
     return `client_demo_${max + 1}`;
   };
 const handleFormSubmit = (data: FormValues) => {
-  // luôn lấy giá trị mới nhất
-  const avatarUrl = watch("avatar") || "";
-
-  const parsedMeta = data.meta?.trim() 
-      ? data.meta.trim().startsWith("{") 
-        ? JSON.parse(data.meta) 
-        : { openai: data.meta.trim() } 
-      : undefined;
+  // Lấy giá trị avatar thực sự, convert Proxy thành string
+  const avatarUrl = typeof data.avatar === "string" ? data.avatar : "";
+ console.log("Avatar chuẩn bị gửi:", avatarUrl, typeof avatarUrl);
+  const parsedMeta = data.meta?.trim()
+    ? data.meta.trim().startsWith("{")
+      ? JSON.parse(data.meta)
+      : { openai: data.meta.trim() }
+    : undefined;
 
   const payload: Partial<IClient> = {
     clientId: client?.clientId || generateClientId(),
     ...data,
-    avatar: avatarUrl, // đảm bảo gửi avatar mới nhất
+    avatar: avatarUrl, // ✅ string thuần
     meta: parsedMeta,
     api_keys: parsedMeta ? { openai: parsedMeta.openai } : {},
   };
 
   onSubmit(payload);
 };
+
 
 
 
