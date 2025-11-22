@@ -78,7 +78,7 @@ static async createClient(req: Request, res: Response) {
       username: data.username,
       name: data.name,
       password: data.password,
-      role: 'owner',           // phải hợp lệ enum schema
+      role: 'client',           
       clientId: data.clientId,
       avatar: avatarUrl,
     });
