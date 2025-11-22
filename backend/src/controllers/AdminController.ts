@@ -42,7 +42,7 @@ export default class AdminController {
 
     const client = await ClientModel.create({
       ...data,
-     avatar: typeof data.avatar === "string" && data.avatar.trim() !== "" ? data.avatar : "",
+        avatar: data.avatar?.trim() ? data.avatar : undefined,
       trial_end: null, // vĩnh viễn
       user_count: data.user_count ?? 0,
     });
