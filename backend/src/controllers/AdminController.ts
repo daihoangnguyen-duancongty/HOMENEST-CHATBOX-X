@@ -33,7 +33,8 @@ static async createClient(req: Request, res: Response) {
     try {
       const data = req.body;
       const file = req.file;
-
+console.log('BODY:', req.body);
+console.log('FILE:', req.file);
       let avatarUrl = '';
       if (file) {
         const result: UploadApiResponse = await new Promise((resolve, reject) => {
