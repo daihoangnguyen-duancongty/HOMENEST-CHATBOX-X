@@ -55,38 +55,28 @@ export default function ClientFormModal({ clients, client, onSubmit, onClose }: 
     const max = Math.max(...numbers);
     return `client_demo_${max + 1}`;
   };
-
 const handleFormSubmit = (data: FormValues) => {
-  let parsedMeta: Record<string, any> | undefined;
+  // luôn lấy giá trị mới nhất
+  const avatarUrl = watch("avatar") || "";
 
-  if (data.meta && data.meta.trim() !== "") {
-    const metaStr = data.meta.trim();
+  const parsedMeta = data.meta?.trim() 
+      ? data.meta.trim().startsWith("{") 
+        ? JSON.parse(data.meta) 
+        : { openai: data.meta.trim() } 
+      : undefined;
 
-    // 1) Nếu người dùng nhập JSON → parse bình thường
-    if (metaStr.startsWith("{")) {
-      try {
-        parsedMeta = JSON.parse(metaStr);
-      } catch (e) {
-        alert("Meta phải là JSON hợp lệ!");
-        return;
-      }
-    } 
-    // 2) Nếu người dùng chỉ nhập API key → tự convert JSON
-    else {
-      parsedMeta = { openai: metaStr };
-    }
-  }
+  const payload: Partial<IClient> = {
+    clientId: client?.clientId || generateClientId(),
+    ...data,
+    avatar: avatarUrl, // đảm bảo gửi avatar mới nhất
+    meta: parsedMeta,
+    api_keys: parsedMeta ? { openai: parsedMeta.openai } : {},
+  };
 
-  const newClientId = client?.clientId || generateClientId();
-
-const payload: Partial<IClient> = {
-  clientId: newClientId,
-  ...data,
-  meta: parsedMeta,
-  api_keys: parsedMeta ? { openai: parsedMeta.openai } : {},
-};
   onSubmit(payload);
 };
+
+
 
 
   return (
@@ -190,7 +180,7 @@ const payload: Partial<IClient> = {
 
         <div className="flex justify-end gap-2 mt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 transition">Hủy</button>
-          <button type="submit" className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition">{client ? 'Cập nhật' : 'Tạo mới'}</button>
+          <button type="submit" className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition" >{client ? 'Cập nhật' : 'Tạo mới'}</button>
         </div>
       </form>
     </div>
