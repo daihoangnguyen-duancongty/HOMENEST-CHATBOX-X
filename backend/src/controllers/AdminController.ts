@@ -30,12 +30,12 @@ export default class AdminController {
 static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
-console.log("Payload createClient:", data);
-    // 1. Tạo client trước
+    const avatarUrl = data.avatar || "";
+
     const newClient = await ClientModel.create({
       clientId: data.clientId,
       name: data.name,
-      avatar: data.avatar,    // <--- THÊM DÒNG NÀY
+      avatar: avatarUrl,
       user_count: data.user_count,
       ai_provider: data.ai_provider,
       api_keys: data.api_keys,
@@ -43,25 +43,22 @@ console.log("Payload createClient:", data);
       color: data.color,
     });
 
-
-    // 2. Tạo user owner
     const user = await UserModel.create({
       username: data.username,
       name: data.name,
       password: data.password,
       role: "owner",
       clientId: data.clientId,
-      avatar: data.avatar,   // <--- THÊM DÒNG NÀY
-    });
-console.log("nguoi dung da tao:", user);
-    return res.json({
-      ok: true,
-      client: newClient,     // <--- BACKEND MUST RETURN THIS
-      user,
+      avatar: avatarUrl,
     });
 
+    return res.json({
+      ok: true,
+      client: newClient,
+      user,
+    });
   } catch (err) {
-    console.error("Create client user error:", err);
+    console.error("Create client error:", err);
     return res.status(500).json({ error: "Server error" });
   }
 }
