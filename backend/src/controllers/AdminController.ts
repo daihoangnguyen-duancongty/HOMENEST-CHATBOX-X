@@ -95,14 +95,13 @@ static async createClient(req: Request, res: Response) {
 // UPDATE CLIENT
 static async updateClient(req: Request, res: Response) {
   try {
-    const data = req.body;
+    const data = { ...req.body };
     const file = req.file;
 
     console.log('BODY:', data);
     console.log('FILE:', file);
 
     // 1️⃣ Upload avatar nếu có
-    let avatarUrl: string | undefined = undefined;
     if (file) {
       const result: UploadApiResponse = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -111,7 +110,7 @@ static async updateClient(req: Request, res: Response) {
         );
         stream.end(file.buffer);
       });
-      avatarUrl = result.secure_url;
+      data.avatar = result.secure_url;
     }
 
     // 2️⃣ Chuyển user_count sang number
@@ -119,21 +118,16 @@ static async updateClient(req: Request, res: Response) {
       data.user_count = Number(data.user_count);
     }
 
-    // 3️⃣ Parse meta nếu là string JSON
+    // 3️⃣ Parse meta nếu là string
     if (data.meta && typeof data.meta === 'string') {
       try {
         data.meta = JSON.parse(data.meta);
       } catch {
-        // giữ nguyên nếu không parse được
+        data.meta = data.meta; // giữ nguyên nếu không parse được
       }
     }
 
-    // 4️⃣ Nếu có avatar mới, cập nhật avatar
-    if (avatarUrl) {
-      data.avatar = avatarUrl;
-    }
-
-    // 5️⃣ Cập nhật Client
+    // 4️⃣ Update client
     const client = await ClientModel.findOneAndUpdate(
       { clientId: req.params.clientId },
       data,
@@ -143,11 +137,12 @@ static async updateClient(req: Request, res: Response) {
     if (!client) return res.status(404).json({ error: 'Client not found' });
 
     return res.json({ ok: true, client });
-  } catch (err: any) {
+  } catch (err) {
     console.error('Update client error:', err);
-    return res.status(500).json({ error: err.message || 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 }
+
 
   // DELETE CLIENT
   static async deleteClient(req: Request, res: Response) {
