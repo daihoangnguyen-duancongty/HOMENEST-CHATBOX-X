@@ -27,12 +27,10 @@ instance.interceptors.response.use(
 
 // Generic fetcher wrapper dùng admin token cho tất cả
 export async function fetcher<T = any>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
-  const { data, ...rest } = options;
-
   const response = await instance.request({
     url: path,
-    ...rest,
-    data: data ? JSON.stringify(data) : undefined,
+    ...options,
+    data: options.data, // ⬅ không stringify nữa
   });
 
   return response.data;

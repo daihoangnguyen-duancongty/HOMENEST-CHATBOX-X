@@ -27,34 +27,44 @@ export default class AdminController {
   }
 
   // CREATE CLIENT
-static async createClient(req: Request, res: Response) {
+static async createClientUser(req: Request, res: Response) {
   try {
     const data = req.body;
 
-    // 🔹 Bước 1: log payload trước khi tạo
-    console.log("Payload trước khi create:", data);
+    // 1. Tạo client trước
+    const newClient = await ClientModel.create({
+      clientId: data.clientId,
+      name: data.name,
+      avatar: data.avatar,    // <--- THÊM DÒNG NÀY
+      user_count: data.user_count,
+      ai_provider: data.ai_provider,
+      api_keys: data.api_keys,
+      meta: data.meta,
+      color: data.color,
+    });
 
-    if (!data.clientId || !data.name)
-      return res.status(400).json({ error: 'clientId & name are required' });
+    // 2. Tạo user owner
+    const user = await UserModel.create({
+      username: data.username,
+      name: data.name,
+      password: data.password,
+      role: "owner",
+      clientId: data.clientId,
+      avatar: data.avatar,   // <--- THÊM DÒNG NÀY
+    });
 
-    const exists = await ClientModel.findOne({ clientId: data.clientId });
-    if (exists) return res.status(400).json({ error: 'ClientId exists' });
+    return res.json({
+      ok: true,
+      client: newClient,     // <--- BACKEND MUST RETURN THIS
+      user,
+    });
 
-    // 🔹 Bước 2: tạo client và log document vừa tạo
-const client = await ClientModel.create({
-  ...data,
-  trial_end: null,
-  user_count: data.user_count ?? 0,
-});
-
-
-    console.log("Client vừa tạo:", client);
-
-    return res.json({ ok: true, client }); // ⚠ trả về toàn bộ object client, không chỉ userId
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+  } catch (err) {
+    console.error("Create client user error:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 }
+
 
   // UPDATE CLIENT
 static async updateClient(req: Request, res: Response) {
