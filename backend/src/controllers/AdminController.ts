@@ -30,7 +30,8 @@ export default class AdminController {
  static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
-
+ // 🔹 Log avatar để debug
+    console.log("Avatar trước khi tạo:", data.avatar, typeof data.avatar);
     if (!data.clientId || !data.name)
       return res.status(400).json({ error: 'clientId & name are required' });
 
@@ -42,7 +43,7 @@ export default class AdminController {
 
     const client = await ClientModel.create({
       ...data,
-        avatar: data.avatar?.trim() ? data.avatar : undefined,
+        avatar: typeof data.avatar === "string" && data.avatar.trim() !== "" ? data.avatar : "",
       trial_end: null, // vĩnh viễn
       user_count: data.user_count ?? 0,
     });
