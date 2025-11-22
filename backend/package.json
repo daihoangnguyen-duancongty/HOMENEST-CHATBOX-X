@@ -19,12 +19,14 @@
     "apollo-server-express": "^3.13.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "graphql": "^16.12.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
+    "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "uuid": "^13.0.0"
   },
@@ -35,6 +37,7 @@
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.10.0",
     "@types/uuid": "^10.0.0",
     "typescript": "^5.9.3"

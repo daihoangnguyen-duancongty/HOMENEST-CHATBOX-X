@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AdminController from '../controllers/AdminController';
 import { adminAuth } from '../middlewares/adminAuth';
+import { upload } from '../middlewares/upload';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.post('/clients/sync', adminAuth, AdminController.syncClient);
 // CRUD clients
 router.get('/clients', adminAuth, AdminController.getClients);
 router.get('/clients/:clientId', adminAuth, AdminController.getClientById);
-router.post('/clients', adminAuth, AdminController.createClient);
+router.post('/clients', adminAuth, upload.single('avatar'), AdminController.createClient);
 router.put('/clients/:clientId', adminAuth, AdminController.updateClient);
 router.delete('/clients/:clientId', adminAuth, AdminController.deleteClient);
 

@@ -3,6 +3,8 @@ import { ClientModel } from '../models/Client';
 import { UserModel } from '../models/User';
 import { ClientLogModel } from '../models/ClientLog';
 import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
+import cloudinary from '../config/cloudinary';
+import { UploadApiResponse } from 'cloudinary';
 
 export default class AdminController {
   // GET ALL CLIENTS
@@ -28,40 +30,53 @@ export default class AdminController {
 
   // CREATE CLIENT
 static async createClient(req: Request, res: Response) {
-  try {
-    const data = req.body;
-    const avatarUrl = data.avatar || "";
+    try {
+      const data = req.body;
+      const file = req.file;
 
-    const newClient = await ClientModel.create({
-      clientId: data.clientId,
-      name: data.name,
-      avatar: avatarUrl,
-      user_count: data.user_count,
-      ai_provider: data.ai_provider,
-      api_keys: data.api_keys,
-      meta: data.meta,
-      color: data.color,
-    });
+      let avatarUrl = '';
+      if (file) {
+        const result: UploadApiResponse = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'homenest/homenest-chatbotx-client',
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result!);
+            }
+          );
+          stream.end(file.buffer);
+        });
+        avatarUrl = result.secure_url;
+      }
 
-    const user = await UserModel.create({
-      username: data.username,
-      name: data.name,
-      password: data.password,
-      role: "owner",
-      clientId: data.clientId,
-      avatar: avatarUrl,
-    });
+      const newClient = await ClientModel.create({
+        clientId: data.clientId,
+        name: data.name,
+        avatar: avatarUrl,
+        user_count: data.user_count,
+        ai_provider: data.ai_provider,
+        api_keys: data.api_keys,
+        meta: data.meta,
+        color: data.color,
+      });
 
-    return res.json({
-      ok: true,
-      client: newClient,
-      user,
-    });
-  } catch (err) {
-    console.error("Create client error:", err);
-    return res.status(500).json({ error: "Server error" });
+      const user = await UserModel.create({
+        username: data.username,
+        name: data.name,
+        password: data.password,
+        role: 'owner',
+        clientId: data.clientId,
+        avatar: avatarUrl,
+      });
+
+      return res.json({ ok: true, client: newClient, user });
+    } catch (err) {
+      console.error('Create client error:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
   }
-}
 
 
   // UPDATE CLIENT
