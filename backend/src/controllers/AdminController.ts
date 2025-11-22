@@ -27,7 +27,7 @@ export default class AdminController {
   }
 
   // CREATE CLIENT
-static async createClientUser(req: Request, res: Response) {
+static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
 
