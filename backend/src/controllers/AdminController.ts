@@ -30,7 +30,7 @@ export default class AdminController {
 static async createClient(req: Request, res: Response) {
   try {
     const data = req.body;
-
+console.log("Payload createClient:", data);
     // 1. Tạo client trước
     const newClient = await ClientModel.create({
       clientId: data.clientId,
@@ -43,6 +43,7 @@ static async createClient(req: Request, res: Response) {
       color: data.color,
     });
 
+
     // 2. Tạo user owner
     const user = await UserModel.create({
       username: data.username,
@@ -52,7 +53,7 @@ static async createClient(req: Request, res: Response) {
       clientId: data.clientId,
       avatar: data.avatar,   // <--- THÊM DÒNG NÀY
     });
-
+console.log("nguoi dung da tao:", user);
     return res.json({
       ok: true,
       client: newClient,     // <--- BACKEND MUST RETURN THIS
