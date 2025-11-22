@@ -37,8 +37,16 @@ export async function fetcher<T = any>(path: string, options: AxiosRequestConfig
 }
 
 // Helper riêng cho FormData (file upload)
-export async function postFormData<T = any>(path: string, formData: FormData): Promise<T> {
-  const res = await axios.post(`${BASE_URL}${path}`, formData, {
+// Helper riêng cho FormData (file upload) hỗ trợ PUT/POST
+export async function postFormData<T = any>(
+  path: string,
+  formData: FormData,
+  method: 'POST' | 'PUT' = 'POST'
+): Promise<T> {
+  const res = await axios({
+    url: `${BASE_URL}${path}`,
+    method,
+    data: formData,
     headers: {
       Authorization: `Bearer ${ADMIN_SYNC_TOKEN}`, // Multer nhận file
       // KHÔNG set Content-Type, browser tự thêm multipart/form-data

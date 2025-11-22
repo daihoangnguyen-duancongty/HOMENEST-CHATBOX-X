@@ -58,32 +58,39 @@ export default function ClientFormModal({ clients, client, onClose }: Props) {
   };
 
 const onSubmit = async (data: FormValues) => {
-  // Nếu đang edit, lấy clientId từ client cũ
-  const clientId = client?.clientId;
+  try {
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('name', data.name);
+    formData.append('password', data.password);
+    formData.append('user_count', String(data.user_count));
+    formData.append('ai_provider', data.ai_provider);
+    
+    // meta JSON
+    formData.append('meta', data.meta ? data.meta : '{}');
 
-  const formData = new FormData();
-  formData.append('username', data.username);
-  formData.append('name', data.name);
-  formData.append('password', data.password);
-  formData.append('user_count', String(data.user_count));
-  formData.append('ai_provider', data.ai_provider);
-  formData.append('meta', data.meta || '{}');
+    // avatar
+    if (fileInput.current?.files?.[0]) {
+      formData.append('avatar', fileInput.current.files[0]);
+    }
+if (client) {
+  // đang edit → dùng PUT
+  await postFormData(`/admin-api/clients/${client.clientId}`, formData, 'PUT');
+} else {
+  // tạo mới → dùng POST
+  formData.append('clientId', generateClientId());
+  await postFormData('/admin-api/clients', formData, 'POST');
+}
 
-  if (fileInput.current?.files?.[0]) {
-    formData.append('avatar', fileInput.current.files[0]);
+
+
+    onClose();
+  } catch (err: any) {
+    console.error('Submit client error:', err);
+    alert(err?.response?.data?.error || 'Có lỗi xảy ra');
   }
-
-  if (client) {
-    // update client
-    await postFormData(`/admin-api/clients/${clientId}`, formData, 'PATCH');
-  } else {
-    // tạo mới client
-    formData.append('clientId', generateClientId());
-    await postFormData('/admin-api/clients', formData);
-  }
-
-  onClose();
 };
+
 
 
   return (
