@@ -104,7 +104,7 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
           <div className="chat-widget-header">
             <div className="chat-widget-header-left">
               <img src={userAvatar} alt="User" className="chat-widget-header-avatar" />
-              <span>  HN CHATBOT X</span>
+              <span>CHATBOT X</span>
             </div>
             <div className="chat-widget-header-right">
               <div className="chat-widget-settings-wrapper">

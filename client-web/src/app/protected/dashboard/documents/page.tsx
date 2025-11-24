@@ -41,7 +41,7 @@ export default function DocumentsPage() {
     <div className='flex min-h-screen '>
       <main className='flex-1 ml-4 p-8 overflow-auto'>
         <h1 className='text-4xl font-extrabold mb-8 text-gray-900'>
-          Hướng dẫn sử dụng hệ thống Admin
+          Hướng dẫn sử dụng hệ thống Client
         </h1>
 
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>

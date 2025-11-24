@@ -19,22 +19,40 @@ interface GetMessagesResponse {
  */
 export const getChatHistory = async (clientId: string, backend: string = BASE_URL) => {
   try {
-    const res = await axios.get(`${backend}/${clientId}`);
+    const res = await axios.get(`${backend}/chat/${clientId}`);
     return res.data.messages || [];
   } catch (err) {
     console.error('getChatHistory error:', err);
     return [];
   }
 };
-
-export const sendMessageToAI = async (clientId: string, message: string, backend: string = BASE_URL) => {
+export const sendMessageToAI = async (
+  clientId: string,
+  message: string,
+  backend: string = BASE_URL
+) => {
   try {
-    const res = await axios.post(backend, { client_id: clientId, message });
+    const token = window.HOMENEST_CHATBOT_WIDGET?.token;
+    if (!token || !clientId) throw new Error("Missing token or clientId");
+
+    const res = await axios.post(
+      `${backend}/admin-api/chat`,
+      { message, clientId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return res.data.reply;
   } catch (err) {
-    console.error('sendMessageToAI error:', err);
-    return 'Lỗi kết nối server.';
+    console.error("sendMessageToAI error:", err);
+    return "Lỗi kết nối server.";
   }
 };
+
+
 
 
