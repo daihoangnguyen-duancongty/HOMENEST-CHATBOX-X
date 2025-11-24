@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { IClient } from '@/types/admin';
+import { IClient } from '@/types/client-owner-types';
 import ConfirmModal from './ConfirmModal';
 import Toast from './Toast';
 import ToggleSwitch from './ToggleSwitch';

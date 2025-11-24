@@ -1,3 +1,5 @@
+
+// Tạo nhân viên cho Client owner
 'use client';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -29,7 +31,7 @@ export default function RegisterPage() {
         formData.append('avatar', avatarFile);
       }
 
-      await fetcher('/auth/register', {
+      await fetcher('/api/client/create-employee', {
         method: 'POST',
         data: formData, // Gửi formData
         headers: { 'Content-Type': 'multipart/form-data' },

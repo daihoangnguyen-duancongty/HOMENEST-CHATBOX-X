@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DashboardStats } from '@/types/admin';
-import { getDashboardStats } from '@/api/admin';
+import { DashboardStats } from '@/types/client-owner-types';
+import { getDashboardStats } from '@/api/client-owner';
 import {
   PieChart,
   Pie,

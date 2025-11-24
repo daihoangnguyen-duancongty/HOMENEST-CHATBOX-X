@@ -1,5 +1,5 @@
 import { fetcher } from '@/config/fetcher';
-import type { DashboardStats, IClient, IPlan } from '@/types/admin';
+import type { DashboardStats, IClient, ISubscriptionPlan } from '@/types/client-owner-types';
 
 const ADMIN_PREFIX = '/api/admin';
 const ADMIN_PREFIX_STATS = '/admin-api';

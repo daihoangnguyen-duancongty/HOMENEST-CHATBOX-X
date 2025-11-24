@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginAdmin } from '@/api/auth';
+import { loginAll } from '@/api/auth';
 import { useAuthStore } from '@/store/authSlice';
 import SuccessPopup from '@/components/SuccessPopup';
 
@@ -19,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       // Gọi API login
-      const { token, user } = await loginAdmin({ username, password });
+      const { token, user } = await loginAll({ username, password });
 
       // Lưu token + user vào Zustand store
       login(token, user);

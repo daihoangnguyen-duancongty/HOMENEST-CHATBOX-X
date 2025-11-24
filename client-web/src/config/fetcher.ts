@@ -3,13 +3,13 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "";
-const ADMIN_SYNC_TOKEN = process.env.NEXT_PUBLIC_ADMIN_SYNC_TOKEN; // nhớ thêm NEXT_PUBLIC_ ở .env
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN; // nhớ thêm NEXT_PUBLIC_ ở .env
 
 const instance = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${ADMIN_SYNC_TOKEN}`, // attach admin token mặc định
+    Authorization: `Bearer ${CLIENT_TOKEN}`, // attach admin token mặc định
   },
 });
 
@@ -48,7 +48,7 @@ export async function postFormData<T = any>(
     method,
     data: formData,
     headers: {
-      Authorization: `Bearer ${ADMIN_SYNC_TOKEN}`, // Multer nhận file
+      Authorization: `Bearer ${CLIENT_TOKEN}`, // Multer nhận file
       // KHÔNG set Content-Type, browser tự thêm multipart/form-data
     },
   });

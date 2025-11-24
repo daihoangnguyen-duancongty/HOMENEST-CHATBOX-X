@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as clientApi from '@/api/admin';
-import { IClient } from '@/types/admin';
+import * as clientApi from '@/api/client-owner';
+import { IClient } from '@/types/client-owner-types';
 
 export const useClients = () => {
   const queryClient = useQueryClient();

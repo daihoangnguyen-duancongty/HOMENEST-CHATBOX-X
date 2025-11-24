@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useClients } from '@/hooks/useClients';
+import { useClients } from '@/hooks/useClientsOwner';
 import { usePlans } from '@/hooks/usePlans';
 import ClientsTable from '@/components/ClientsTable';
 import ClientFormModal from '@/components/ClientFormModal';

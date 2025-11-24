@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { IClient, ISubscriptionPlan } from '@/types/admin';
+import { IClient, ISubscriptionPlan } from '@/types/client-owner-types';
 import { postFormData } from '@/config/fetcher';
 import { useRef } from 'react';
 import Image from 'next/image';
