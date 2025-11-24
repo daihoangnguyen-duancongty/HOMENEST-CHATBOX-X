@@ -1,5 +1,5 @@
 import { fetcher } from '@/config/fetcher';
-import type { DashboardStats, IClient, IPlan } from '@/types/admin';
+import type { DashboardStats, IClient, ISubscriptionPlan } from '@/types/admin';
 
 const ADMIN_PREFIX = '/api/admin';
 const ADMIN_PREFIX_STATS = '/admin-api';
@@ -71,12 +71,12 @@ export const syncClient = async (payload: any) =>
   });
 
 // Plans
-export const getPlans = async (): Promise<IPlan[]> => {
+export const getPlans = async (): Promise<ISubscriptionPlan[]> => {
   const data = await fetcher(`${ADMIN_PREFIX_STATS}/plans`);
   return data.plans;
 };
 
-export const createPlan = async (payload: Partial<IPlan>) => {
+export const createPlan = async (payload: Partial<ISubscriptionPlan>) => {
   const data = await fetcher(`${ADMIN_PREFIX_STATS}/plans`, {
     method: 'POST',
     data: payload,
@@ -84,7 +84,7 @@ export const createPlan = async (payload: Partial<IPlan>) => {
   return data.plan;
 };
 
-export const updatePlan = async (id: string, payload: Partial<IPlan>) => {
+export const updatePlan = async (id: string, payload: Partial<ISubscriptionPlan>) => {
   const data = await fetcher(`${ADMIN_PREFIX_STATS}/plans/${id}`, {
     method: 'PUT',
     data: payload,
