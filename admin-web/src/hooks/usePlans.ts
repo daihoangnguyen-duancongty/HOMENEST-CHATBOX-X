@@ -26,7 +26,7 @@ export const usePlans = () => {
   const update = useMutation<
     ISubscriptionPlan,
     Error,
-    { id: string; payload: Partial<IPlan> }
+    { id: string; payload: Partial<ISubscriptionPlan> }
   >({
     mutationFn: ({ id, payload }) => adminApi.updatePlan(id, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
