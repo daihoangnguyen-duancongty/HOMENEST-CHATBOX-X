@@ -41,6 +41,7 @@ const allowedOrigins = [
   'https://www.homenest.tech',
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://homenest-chatbox-x.vercel.app',
 ];
 
 app.use(
