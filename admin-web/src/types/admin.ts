@@ -56,6 +56,7 @@ export type ISubscriptionPlan = {
   _id: string;
   name: string;
   price: number;
+  description?: string; 
   max_users: number;
   max_files: number;
   features: string[];
