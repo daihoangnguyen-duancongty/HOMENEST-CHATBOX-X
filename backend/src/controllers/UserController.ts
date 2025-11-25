@@ -123,11 +123,13 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
 // ──────────────────────────────────────────────────────────────
 //
 export const loginUser = async (req: Request, res: Response) => {
-  const {  username, password } = req.body;
+  const { username, password, clientId } = req.body;y;
 
-  if ( !username || !password) return res.status(400).json({ error: 'Missing fields' });
+ if (!username || !password || !clientId)
+  return res.status(400).json({ error: 'Missing fields' });
 
-  const user = await UserModel.findOne({  username });
+// Tìm user theo BOTH username + clientId
+const user = await UserModel.findOne({ username, clientId });
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const valid = await user.comparePassword(password);
