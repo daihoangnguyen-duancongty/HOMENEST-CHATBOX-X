@@ -7,6 +7,8 @@ import { ClientModel } from '../models/Client';
 import { ClientFileModel } from '../models/ClientFileModel';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import cloudinary from '../config/cloudinary';
+import { UploadApiResponse } from 'cloudinary';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
@@ -86,45 +88,52 @@ export const uploadAvatar = multer({ storage });
 // 2) CLIENT TỰ TẠO EMPLOYEE
 // ──────────────────────────────────────────────────────────────
 //
-export const clientCreateEmployee = async (req: any, res: Response) => {
+
+
+export const clientCreateEmployee = async (req: Request, res: Response) => {
   try {
-    console.log('req.user:', req.user);
-console.log('req.body:', req.body);
-console.log('req.file:', req.file);
-    const loggedUser = req.user;
-    if (!loggedUser || loggedUser.role !== 'client')
-      return res.status(403).json({ error: 'Forbidden' });
+    const { username, name, password } = req.body;
+    const file = req.file;
+    const clientId = req.user?.clientId; // giả sử middleware auth thêm clientId vào req.user
 
-    const clientId = loggedUser.clientId;
-    const { username, password, name } = req.body;
-    const avatarFile = req.file; // multer gán file upload
+    if (!username || !name || !password) {
+      return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin' });
+    }
 
-    const client = await ClientModel.findOne({ clientId });
-    if (!client) return res.status(404).json({ error: 'Client not found' });
+    // Check username unique
+    const existing = await UserModel.findOne({ username });
+    if (existing) {
+      return res.status(400).json({ error: 'Username đã tồn tại' });
+    }
 
-    const maxUsers = client.subscription_plan?.max_users ?? 5;
-    if ((client.user_count ?? 0) >= maxUsers)
-      return res.status(403).json({ error: 'Bạn đã đạt giới hạn user theo gói!' });
+    // Upload avatar lên Cloudinary nếu có
+    let avatarUrl = '';
+    if (file) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'homenest/homenest-chatbotx-client/employee' },
+          (error, result) => (error ? reject(error) : resolve(result!))
+        );
+        stream.end(file.buffer);
+      });
+      avatarUrl = result.secure_url;
+    }
 
-    const exists = await UserModel.findOne({ username, clientId });
-    if (exists) return res.status(400).json({ error: 'Username already exists' });
-
-    const user = await UserModel.create({
+    // Tạo user nhân viên
+    const newUser = await UserModel.create({
       userId: uuidv4(),
-      clientId,
       username,
-      password,
       name,
-      avatar: avatarFile ? `/uploads/avatars/${avatarFile.filename}` : undefined,
+      password,
       role: 'employee',
+      clientId,
+      avatar: avatarUrl,
     });
 
-    client.user_count = (client.user_count ?? 0) + 1;
-    await client.save();
-
-    return res.json({ ok: true, userId: user.userId });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+    return res.json({ ok: true, user: newUser });
+  } catch (err) {
+    console.error('Create employee error:', err);
+    return res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -201,25 +210,45 @@ export const clientGetEmployee = async (req: any, res: Response) => {
   return res.json({ ok: true, employee });
 };
 // update employee
-export const clientUpdateEmployee = async (req: any, res: Response) => {
-  const loggedUser = req.user;
-  const { userId } = req.params;
-  const avatarFile = req.file;
+export const clientUpdateEmployee = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { username, name, password } = req.body;
+    const file = req.file;
+    const clientId = req.user?.clientId; // giả sử authMiddleware thêm clientId vào req.user
 
-  if (!loggedUser || loggedUser.role !== 'client')
-    return res.status(403).json({ error: 'Forbidden' });
+    const user = await UserModel.findOne({ userId, clientId });
+    if (!user) return res.status(404).json({ error: 'Nhân viên không tồn tại' });
 
-  const employee = await UserModel.findOne({ userId, clientId: loggedUser.clientId, role: 'employee' });
-  if (!employee) return res.status(404).json({ error: 'Employee not found' });
+    // Nếu thay đổi username, check unique
+    if (username && username !== user.username) {
+      const exists = await UserModel.findOne({ username });
+      if (exists) return res.status(400).json({ error: 'Username đã tồn tại' });
+      user.username = username;
+    }
 
-  const { username, name, password } = req.body;
-  if (username) employee.username = username;
-  if (name) employee.name = name;
-  if (password) employee.password = password; // bcrypt hash sẽ xử lý trong model pre-save
-  if (avatarFile) employee.avatar = `/uploads/avatars/${avatarFile.filename}`;
+    if (name) user.name = name;
+    if (password) user.password = password;
 
-  await employee.save();
-  return res.json({ ok: true, employee });
+    // Upload avatar mới nếu có
+    if (file) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'homenest/homenest-chatbotx-client/employee' },
+          (error, result) => (error ? reject(error) : resolve(result!))
+        );
+        stream.end(file.buffer);
+      });
+      user.avatar = result.secure_url;
+    }
+
+    await user.save();
+
+    return res.json({ ok: true, user });
+  } catch (err) {
+    console.error('Update employee error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
 };
 // delete employee
 export const clientDeleteEmployee = async (req: any, res: Response) => {
