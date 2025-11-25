@@ -123,7 +123,7 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
 // ──────────────────────────────────────────────────────────────
 //
 export const loginUser = async (req: Request, res: Response) => {
-  const { username, password, clientId } = req.body;y;
+  const { username, password, clientId } = req.body;
 
  if (!username || !password || !clientId)
   return res.status(400).json({ error: 'Missing fields' });
