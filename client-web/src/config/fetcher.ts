@@ -37,13 +37,14 @@ export async function postFormData<T = any>(
   formData: FormData,
   method: "POST" | "PUT" = "POST"
 ): Promise<T> {
+  const token = localStorage.getItem("token"); // <-- Lấy token của client đang login
   const res = await axios({
     url: `${BASE_URL}${path}`,
     method,
     data: formData,
     headers: {
-      Authorization: `Bearer ${CLIENT_TOKEN}`,
-      // KHÔNG set Content-Type
+      Authorization: `Bearer ${token}`, // Dùng token login
+      // KHÔNG set Content-Type, để axios tự detect
     },
   });
 

@@ -12,85 +12,85 @@ interface SidebarProps {
 
 export default function Sidebar({ className }: SidebarProps) {
   const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);     // 👈 GET ROLE HERE
   const router = useRouter();
 
+  const isClient = user?.role === 'client';
+  const isEmployee = user?.role === 'employee';
+
   const handleLogout = () => {
-    logout(); // Xóa token + user
-    router.push('/auth/login'); // Redirect về login
+    logout();
+    router.push('/auth/login');
   };
 
   return (
     <nav
       className={`flex flex-col h-screen w-64 bg-pink-600 text-white p-4 ${className}`}
     >
-      <h1 className='text-2xl font-bold mb-6'>Chatbot X Client</h1>
+      <h1 className='text-2xl font-bold mb-6'>
+        Chatbot X {isEmployee ? 'Employee' : 'Client'}
+      </h1>
+
       <ul className='space-y-2'>
+
         <li>
-          <Link
-            href='/protected/dashboard'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
+          <Link href='/protected/dashboard' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
             <FaHome /> Trang chủ
           </Link>
         </li>
-        <li>
-          <Link
-            href='/protected/dashboard/documents'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
-            <FaBook /> Hướng dẫn
-          </Link>
-        </li>
+
+        {/*  Only CLIENT can see Documents */}
+        {isClient && (
           <li>
-          <Link
-            href='/protected/dashboard/chat'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
+            <Link href='/protected/dashboard/documents' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
+              <FaBook /> Hướng dẫn
+            </Link>
+          </li>
+        )}
+
+        {/*  Chat – both can see */}
+        <li>
+          <Link href='/protected/dashboard/chat' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
             <FaBoxOpen /> Tin nhắn
           </Link>
         </li>
-                <li>
-          <Link
-            href='/protected/dashboard/customers'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
-            <FaBoxOpen /> Khách hàng
-          </Link>
-        </li>
+
+        {/*  Customer – both can see */}
         <li>
-          <Link
-            href='/protected/dashboard/employees'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
-            <FaUsers /> Nhân viên
+          <Link href='/protected/dashboard/customers' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
+            <FaUsers /> Khách hàng
           </Link>
         </li>
-        <li>
-          <Link
-            href='/protected/dashboard/plans'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
-            <FaBoxOpen /> Gói sản phẩm
-          </Link>
-        </li>
-        <li>
-          <Link
-            href='/protected/dashboard/train-model'
-            className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
-          >
-            <FaBrain /> Huấn luyện mô hình
-          </Link>
-        </li>
-        {/* <li>
-          <button
-            onClick={handleLogout}
-            className='w-full text-left hover:bg-gray-700 p-2 rounded block'
-          >
-            Đăng xuất
-          </button>
-        </li> */}
+
+        {/*  Employees – ONLY CLIENT */}
+        {isClient && (
+          <li>
+            <Link href='/protected/dashboard/employees' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
+              <FaUsers /> Nhân viên
+            </Link>
+          </li>
+        )}
+
+        {/*  Plans – ONLY CLIENT */}
+        {isClient && (
+          <li>
+            <Link href='/protected/dashboard/plans' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
+              <FaBoxOpen /> Gói sản phẩm
+            </Link>
+          </li>
+        )}
+
+        {/*  Train model – ONLY CLIENT */}
+        {isClient && (
+          <li>
+            <Link href='/protected/dashboard/train-model' className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'>
+              <FaBrain /> Huấn luyện mô hình
+            </Link>
+          </li>
+        )}
+
       </ul>
-      {/* ⭐ Đẩy Account xuống đáy */}
+
       <div className='mt-auto pt-4'>
         <Account />
       </div>

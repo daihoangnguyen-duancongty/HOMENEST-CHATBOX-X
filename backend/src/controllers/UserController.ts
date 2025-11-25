@@ -1,5 +1,6 @@
 // DÙNG CHO CLIENT TẠO CLIENT-OWNER VÀ CLIENT TẠO USER NHÂN VIÊN
-
+import multer from 'multer';
+import path from 'path';
 import { Request, Response } from 'express';
 import { UserModel } from '../models/User';
 import { ClientModel } from '../models/Client';
@@ -8,6 +9,18 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/avatars/'); // thư mục lưu avatar
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${uuidv4()}${path.extname(file.originalname)}`);
+  },
+});
+
+export const uploadAvatar = multer({ storage });
 
 //
 // ──────────────────────────────────────────────────────────────
@@ -73,37 +86,36 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 // 2) CLIENT TỰ TẠO EMPLOYEE
 // ──────────────────────────────────────────────────────────────
 //
-export const clientCreateEmployee = async (req: Request, res: Response) => {
+export const clientCreateEmployee = async (req: any, res: Response) => {
   try {
-    const loggedUser: any = (req as any).user; // ← đây mới đúng
-
+    console.log('req.user:', req.user);
+console.log('req.body:', req.body);
+console.log('req.file:', req.file);
+    const loggedUser = req.user;
     if (!loggedUser || loggedUser.role !== 'client')
       return res.status(403).json({ error: 'Forbidden' });
 
     const clientId = loggedUser.clientId;
-    const { username, password, name, avatar } = req.body;
+    const { username, password, name } = req.body;
+    const avatarFile = req.file; // multer gán file upload
 
-    // Check client tồn tại
     const client = await ClientModel.findOne({ clientId });
     if (!client) return res.status(404).json({ error: 'Client not found' });
 
-    // Check limit số employee
     const maxUsers = client.subscription_plan?.max_users ?? 5;
-    if ((client.user_count ?? 0) >= maxUsers) {
-      return res.status(403).json({ error: 'Bạn đã đạt giới hạn user theo gói!', limit: maxUsers });
-    }
+    if ((client.user_count ?? 0) >= maxUsers)
+      return res.status(403).json({ error: 'Bạn đã đạt giới hạn user theo gói!' });
 
-    // Check username tồn tại
     const exists = await UserModel.findOne({ username, clientId });
     if (exists) return res.status(400).json({ error: 'Username already exists' });
 
     const user = await UserModel.create({
       userId: uuidv4(),
-      clientId, // ← gán đúng clientId của owner
+      clientId,
       username,
       password,
       name,
-      avatar,
+      avatar: avatarFile ? `/uploads/avatars/${avatarFile.filename}` : undefined,
       role: 'employee',
     });
 
@@ -115,7 +127,6 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
 
 //
 // ──────────────────────────────────────────────────────────────
@@ -158,4 +169,75 @@ const user = await UserModel.findOne({ username, clientId });
       clientId: user.clientId,
     },
   });
+};
+
+//
+// ──────────────────────────────────────────────────────────────
+// 4) CRUD (dùng chung cho client CRUD employee)
+// ──────────────────────────────────────────────────────────────
+//
+
+// Lấy danh sách tất cả employee của client
+export const clientGetEmployees = async (req: any, res: Response) => {
+  const loggedUser = req.user;
+  if (!loggedUser || loggedUser.role !== 'client')
+    return res.status(403).json({ error: 'Forbidden' });
+
+  const employees = await UserModel.find({ clientId: loggedUser.clientId, role: 'employee' }).select('-password');
+  return res.json({ ok: true, employees });
+};
+
+// Lấy chi tiết 1 employee
+export const clientGetEmployee = async (req: any, res: Response) => {
+  const loggedUser = req.user;
+  const { userId } = req.params;
+
+  if (!loggedUser || loggedUser.role !== 'client')
+    return res.status(403).json({ error: 'Forbidden' });
+
+  const employee = await UserModel.findOne({ userId, clientId: loggedUser.clientId, role: 'employee' }).select('-password');
+  if (!employee) return res.status(404).json({ error: 'Employee not found' });
+
+  return res.json({ ok: true, employee });
+};
+// update employee
+export const clientUpdateEmployee = async (req: any, res: Response) => {
+  const loggedUser = req.user;
+  const { userId } = req.params;
+  const avatarFile = req.file;
+
+  if (!loggedUser || loggedUser.role !== 'client')
+    return res.status(403).json({ error: 'Forbidden' });
+
+  const employee = await UserModel.findOne({ userId, clientId: loggedUser.clientId, role: 'employee' });
+  if (!employee) return res.status(404).json({ error: 'Employee not found' });
+
+  const { username, name, password } = req.body;
+  if (username) employee.username = username;
+  if (name) employee.name = name;
+  if (password) employee.password = password; // bcrypt hash sẽ xử lý trong model pre-save
+  if (avatarFile) employee.avatar = `/uploads/avatars/${avatarFile.filename}`;
+
+  await employee.save();
+  return res.json({ ok: true, employee });
+};
+// delete employee
+export const clientDeleteEmployee = async (req: any, res: Response) => {
+  const loggedUser = req.user;
+  const { userId } = req.params;
+
+  if (!loggedUser || loggedUser.role !== 'client')
+    return res.status(403).json({ error: 'Forbidden' });
+
+  const employee = await UserModel.findOneAndDelete({ userId, clientId: loggedUser.clientId, role: 'employee' });
+  if (!employee) return res.status(404).json({ error: 'Employee not found' });
+
+  // Giảm user_count của client
+  const client = await ClientModel.findOne({ clientId: loggedUser.clientId });
+  if (client) {
+    client.user_count = Math.max((client.user_count ?? 1) - 1, 0);
+    await client.save();
+  }
+
+  return res.json({ ok: true, message: 'Employee deleted' });
 };

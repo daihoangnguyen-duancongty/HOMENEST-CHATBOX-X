@@ -2,8 +2,13 @@
 import { Router } from 'express';
 import {
   clientCreateEmployee,
+  clientGetEmployees,
+  clientGetEmployee,
+  clientUpdateEmployee,
+  clientDeleteEmployee,
   loginUser,
 } from '../controllers/UserController';
+import { uploadAvatar } from '../controllers/UserController';
 import AdminController from '../controllers/AdminController';
 import { authMiddleware } from '../middlewares/auth';
 import { requireRole } from '../middlewares/role';
@@ -16,7 +21,11 @@ const router = Router();
 // Route mở lại client sau khi đóng phí
 router.post('/client/reactivate', authMiddleware, AdminController.reactivateClient);
 // Client tạo Employee
-router.post('/client/create-employee', authMiddleware, requireRole('client'), clientCreateEmployee);
+router.post('/client/create-employee', authMiddleware, requireRole('client'), uploadAvatar.single('avatar'), clientCreateEmployee);
+router.get('/client/employees', authMiddleware, requireRole('client'), clientGetEmployees);
+router.get('/client/employees/:userId', authMiddleware, requireRole('client'), clientGetEmployee);
+router.put('/client/employees/:userId', authMiddleware, requireRole('client'), uploadAvatar.single('avatar'), clientUpdateEmployee);
+router.delete('/client/employees/:userId', authMiddleware, requireRole('client'), clientDeleteEmployee);
 
 // Login chung
 router.post('/login', loginUser);
