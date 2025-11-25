@@ -20,12 +20,13 @@ const router = Router();
 // router.post('/admin/create-client-user', adminAuth, clientCreateEmployee);
 // Route mở lại client sau khi đóng phí
 router.post('/client/reactivate', authMiddleware, AdminController.reactivateClient);
-// Client tạo Employee
+// Client CRUD employee
 router.post('/client/create-employee', authMiddleware, requireRole('client'), uploadAvatar.single('avatar'), clientCreateEmployee);
 router.get('/client/employees', authMiddleware, requireRole('client'), clientGetEmployees);
 router.get('/client/employees/:userId', authMiddleware, requireRole('client'), clientGetEmployee);
 router.put('/client/employees/:userId', authMiddleware, requireRole('client'), uploadAvatar.single('avatar'), clientUpdateEmployee);
 router.delete('/client/employees/:userId', authMiddleware, requireRole('client'), clientDeleteEmployee);
+
 
 // Login chung
 router.post('/login', loginUser);
