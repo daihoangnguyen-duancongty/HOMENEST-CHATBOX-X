@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from "express"; 
 import { ChatModel } from "../models/Chat";
 import { CustomerModel } from "../models/Customer";
 import AIService from "../services/AIService";
@@ -34,7 +34,6 @@ export const saveChatMessage = async (
 // ============================================
 // ========= AI CHAT DÀNH CHO USER LOGIN ======
 // ============================================
-
 export const chatWithAI = async (req: Request, res: Response) => {
   try {
     const { client_id, user_id, message, user_name, user_avatar } = req.body;
@@ -53,15 +52,15 @@ export const chatWithAI = async (req: Request, res: Response) => {
 
     res.json({ reply, chatMode: "bot" });
 
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
+  } catch (err: any) {
+    console.error("CHAT ERROR:", err);
+    res.status(500).json({ error: "Server error", detail: err.message });
   }
 };
 
 // ============================================
 // ========= CUSTOMER CHAT (GUEST WIDGET) =====
 // ============================================
-
 export const customerChat = async (req: Request, res: Response) => {
   try {
     const { client_id, customer_id, name, avatar, message } = req.body;
@@ -98,36 +97,47 @@ export const customerChat = async (req: Request, res: Response) => {
 
     res.json({ reply, chatMode: "bot" });
 
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
+  } catch (err: any) {
+    console.error("CUSTOMER CHAT ERROR:", err);
+    res.status(500).json({ error: "Server error", detail: err.message });
   }
 };
 
 // ============================================
 // ======= SWITCH AI → HUMAN SUPPORT =========
 // ============================================
-
 export const switchToHuman = async (req: Request, res: Response) => {
-  const { customer_id } = req.body;
+  try {
+    const { customer_id } = req.body;
 
-  let customer = await CustomerModel.findOne({ customerId: customer_id });
-  if (!customer) return res.status(404).json({ error: "Customer not found" });
+    let customer = await CustomerModel.findOne({ customerId: customer_id });
+    if (!customer) return res.status(404).json({ error: "Customer not found" });
 
-  customer.chatMode = "human";
-  await customer.save();
+    customer.chatMode = "human";
+    await customer.save();
 
-  res.json({ ok: true, message: "Đã chuyển sang tư vấn viên" });
+    res.json({ ok: true, message: "Đã chuyển sang tư vấn viên" });
+
+  } catch (err: any) {
+    console.error("SWITCH TO HUMAN ERROR:", err);
+    res.status(500).json({ error: "Server error", detail: err.message });
+  }
 };
 
 // ============================================
 // ========== EMPLOYEE / CLIENT TRẢ LỜI =======
 // ============================================
-
 export const employeeReply = async (req: Request, res: Response) => {
-  const { customerId, message } = req.body;
-  const clientId = (req as any).user?.clientId;
+  try {
+    const { customerId, message } = req.body;
+    const clientId = (req as any).user?.clientId;
 
-  await saveChatMessage(clientId, customerId, message, "employee");
+    await saveChatMessage(clientId, customerId, message, "employee");
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+
+  } catch (err: any) {
+    console.error("EMPLOYEE REPLY ERROR:", err);
+    res.status(500).json({ error: "Server error", detail: err.message });
+  }
 };
