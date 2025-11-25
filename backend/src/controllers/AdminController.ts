@@ -5,7 +5,7 @@ import { ClientLogModel } from '../models/ClientLog';
 import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
 export default class AdminController {
   // GET ALL CLIENTS
@@ -49,7 +49,14 @@ export default class AdminController {
       }
 
       // Sinh clientId duy nhất bằng UUID
-      let newClientId = uuidv4();
+      let newClientId =  nanoid(12);;
+let exists = true;
+
+while (exists) {
+  newClientId = nanoid(12);
+  const found = await ClientModel.findOne({ clientId: newClientId });
+  exists = !!found; // <-- convert document | null thành boolean
+}
 
       // Chuyển user_count sang number
       const userCount = Number(data.user_count) || 1;
