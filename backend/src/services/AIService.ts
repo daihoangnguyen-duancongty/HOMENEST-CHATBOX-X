@@ -19,8 +19,9 @@ export default class AIService {
     const ProvidersMap: Record<string, any> = {
       openai: class {
         static async call(prompt: string, opts: any = {}) {
-          const key = aiKeys.openai;
-          if (!key) throw new Error('OpenAI API key not set for this client');
+          const key = aiKeys.openai || client.meta?.openai;
+if (!key) throw new Error('OpenAI API key not set for this client');
+
           const url = process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions';
           const body = { model: opts.model || 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], ...opts };
           const res = await fetch(url, {
