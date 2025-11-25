@@ -75,9 +75,10 @@ export const adminCreateClientUser = async (req: Request, res: Response) => {
 //
 export const clientCreateEmployee = async (req: Request, res: Response) => {
   try {
-    const loggedUser: any = req.body._user;
+    const loggedUser: any = (req as any).user; // ← đây mới đúng
 
-    if (loggedUser.role !== 'client') return res.status(403).json({ error: 'Forbidden' });
+    if (!loggedUser || loggedUser.role !== 'client')
+      return res.status(403).json({ error: 'Forbidden' });
 
     const clientId = loggedUser.clientId;
     const { username, password, name, avatar } = req.body;
@@ -86,31 +87,19 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
     const client = await ClientModel.findOne({ clientId });
     if (!client) return res.status(404).json({ error: 'Client not found' });
 
-    // Check limit số employee có thể tạo theo subscription plan
+    // Check limit số employee
     const maxUsers = client.subscription_plan?.max_users ?? 5;
-
     if ((client.user_count ?? 0) >= maxUsers) {
-      return res.status(403).json({
-        error: 'Bạn đã đạt giới hạn user theo gói!',
-        limit: maxUsers,
-      });
+      return res.status(403).json({ error: 'Bạn đã đạt giới hạn user theo gói!', limit: maxUsers });
     }
-    // Check limit số file train model có thể tạo theo subscription plan
-    const maxFiles = client.subscription_plan?.max_files ?? 5;
-    const uploadedFilesCount = await ClientFileModel.countDocuments({ clientId });
-    if ((uploadedFilesCount ?? 0) >= maxFiles) {
-      return res.status(403).json({
-        error: 'Bạn đã đạt giới hạn số file train AI cho gói này',
-        limit: maxFiles,
-      });
-    }
-    // Check username
+
+    // Check username tồn tại
     const exists = await UserModel.findOne({ username, clientId });
     if (exists) return res.status(400).json({ error: 'Username already exists' });
 
     const user = await UserModel.create({
       userId: uuidv4(),
-      clientId,
+      clientId, // ← gán đúng clientId của owner
       username,
       password,
       name,
@@ -119,7 +108,6 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
     });
 
     client.user_count = (client.user_count ?? 0) + 1;
-
     await client.save();
 
     return res.json({ ok: true, userId: user.userId });
@@ -127,6 +115,7 @@ export const clientCreateEmployee = async (req: Request, res: Response) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
 
 //
 // ──────────────────────────────────────────────────────────────

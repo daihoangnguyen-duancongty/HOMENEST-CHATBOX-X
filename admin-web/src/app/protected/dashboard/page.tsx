@@ -10,8 +10,8 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -45,7 +45,7 @@ export default function Stats() {
 
   const lineData = stats
     ? [
-        { name: 'Tổng KH', active: stats.totalClients, trial: 0 },
+        // { name: 'Tổng KH', active: stats.totalClients, trial: 0 },
         { name: 'Thành viên', active: stats.activeClients, trial: 0 },
         { name: 'Dùng thử', active: 0, trial: stats.trialClients },
       ]
@@ -104,56 +104,77 @@ export default function Stats() {
             </ResponsiveContainer>
           </div>
 
-          {/* LINE CHART */}
-          <div className='bg-white/50 backdrop-blur-xl rounded-2xl shadow-xl p-6 h-96 border border-white/20'>
-            <ResponsiveContainer width='100%' height='100%'>
-              <LineChart data={lineData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='name' />
-                <YAxis />
-                <Tooltip
-                  formatter={(value: number) => [`${value} khách`, 'Số lượng']}
-                />
-                <Legend verticalAlign='bottom' height={40} />
+         {/* BAR CHART */}
+<div className='bg-white/50 backdrop-blur-xl rounded-2xl shadow-xl p-6 h-96 border border-white/20'>
+  <ResponsiveContainer width='100%' height='100%'>
+    <BarChart data={lineData}>
+      <CartesianGrid strokeDasharray='3 3' />
+      <XAxis dataKey='name' />
+      <YAxis />
+      <Tooltip formatter={(value: number) => [`${value} khách`, 'Số lượng']} />
+      <Legend verticalAlign='bottom' height={40} />
 
-                {/* Active Clients - tím */}
-                <Line
-                  type='monotone'
-                  dataKey='active'
-                  name='Khách hàng thành viên'
-                  stroke='#6366f1'
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
+      {/* Active Clients - tím */}
+      <Bar
+        dataKey='active'
+        name='Khách hàng thành viên'
+        fill='#6366f1'
+        barSize={30}
+      />
 
-                {/* Trial Clients - đỏ */}
-                <Line
-                  type='monotone'
-                  dataKey='trial'
-                  name='Khách hàng dùng thử'
-                  stroke='#ef4444'
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Trial Clients - đỏ */}
+      <Bar
+        dataKey='trial'
+        name='Khách hàng dùng thử'
+        fill='#ef4444'
+        barSize={30}
+      />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
         </div>
-        {/* CALENDAR */}
-        <div className='mt-10 bg-white/50 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20'>
-          <h2 className='text-xl font-semibold mb-4 text-gray-700'>
-            Lịch làm việc
-          </h2>
+       {/* CALENDAR + STATS ROW */}
+<div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6 bg-transparent">
+  {/* Cột trái: Calendar */}
+  <div className="bg-white/50 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20 bg-transparent">
+    <h2 className="text-xl font-semibold mb-4 text-gray-700">
+      Lịch làm việc
+    </h2>
+    <div className="flex justify-center">
+      <Calendar
+        onChange={(value) => console.log('Ngày được chọn:', value)}
+        className="rounded-xl shadow-lg p-4"
+      />
+    </div>
+  </div>
 
-          <div className='flex justify-center'>
-            <Calendar
-              onChange={(value) => console.log('Ngày được chọn:', value)}
-              className='rounded-xl shadow-lg p-4'
-            />
-          </div>
-        </div>
+  {/* Cột phải: Thống kê số lượng khách hàng */}
+  <div className=" bg-white/50 ackdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/20 bg-transparent">
+    <h2 className="text-xl font-semibold mb-4 text-gray-700">
+      Thống kê khách hàng
+    </h2>
+    <div className="space-y-4">
+      <div className="flex justify-between bg-indigo-100/50 p-3 rounded-lg">
+        <span>Tổng khách hàng:</span>
+        <span className="font-semibold">{stats?.totalClients}</span>
+      </div>
+      <div className="flex justify-between bg-purple-100/50 p-3 rounded-lg">
+        <span>Khách hàng thành viên:</span>
+        <span className="font-semibold">{stats?.activeClients}</span>
+      </div>
+      <div className="flex justify-between bg-red-100/50 p-3 rounded-lg">
+        <span>Khách hàng dùng thử:</span>
+        <span className="font-semibold">{stats?.trialClients}</span>
+      </div>
+      <div className="flex justify-between bg-green-100/50 p-3 rounded-lg">
+        <span>Thành viên hệ thống:</span>
+        <span className="font-semibold">{stats?.totalUsers}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
       </main>
     </div>
   );
