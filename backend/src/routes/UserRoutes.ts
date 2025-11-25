@@ -12,7 +12,7 @@ import { adminAuth } from '../middlewares/adminAuth';
 const router = Router();
 
 // Admin tạo Client Owner
-router.post('/admin/create-client-user', adminAuth, clientCreateEmployee);
+// router.post('/admin/create-client-user', adminAuth, clientCreateEmployee);
 // Route mở lại client sau khi đóng phí
 router.post('/client/reactivate', authMiddleware, AdminController.reactivateClient);
 // Client tạo Employee
