@@ -6,6 +6,7 @@ import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class AdminController {
   // GET ALL CLIENTS
