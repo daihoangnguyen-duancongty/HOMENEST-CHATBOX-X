@@ -5,8 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
+import multer from 'multer';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+
+
+
+
+
+// Sử dụng memoryStorage để upload trực tiếp lên Cloudinary
+export const uploadAvatar = multer({ storage: multer.memoryStorage() });
 
 // =========================
 // 1) CLIENT TẠO EMPLOYEE
