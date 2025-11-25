@@ -9,6 +9,7 @@ import SuccessPopup from '@/components/SuccessPopup';
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [clientId, setClientId] = useState("");
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -19,7 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       // Gọi API login
-      const { token, user } = await loginAll({ username, password });
+     const { token, user } = await loginAll({ username, password, clientId });
 
       // Lưu token + user vào Zustand store
       login(token, user);
@@ -68,7 +69,12 @@ export default function LoginPage() {
             placeholder='Password'
             type='password'
           />
-
+<input
+  className='px-4 py-3 rounded-xl bg-white/80 focus:bg-white border border-white/50 outline-none focus:ring-2 focus:ring-pink-400 transition'
+  value={clientId}
+  onChange={(e) => setClientId(e.target.value)}
+  placeholder='Client Key'
+/>
           <button
             type='submit'
             className='w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold shadow-lg hover:opacity-90 transition'

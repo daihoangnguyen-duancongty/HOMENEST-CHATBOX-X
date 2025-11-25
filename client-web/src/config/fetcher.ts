@@ -3,54 +3,49 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "";
-const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN; // nhớ thêm NEXT_PUBLIC_ ở .env
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN; 
 
+// 👉 Instance mặc định vẫn dùng admin token
 const instance = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${CLIENT_TOKEN}`, // attach admin token mặc định
+    Authorization: `Bearer ${CLIENT_TOKEN}`,
   },
 });
 
-// Response interceptor: handle 401/403 (tuỳ chỉnh nếu cần)
-instance.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    const status = error?.response?.status;
-    if (status === 401 || status === 403) {
-      console.warn("Admin token invalid or forbidden", error);
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Generic fetcher wrapper dùng admin token cho tất cả
-export async function fetcher<T = any>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
+// 👉 Allow override an toàn
+export async function fetcher<T = any>(
+  path: string,
+  options: AxiosRequestConfig = {}
+): Promise<T> {
+  
   const response = await instance.request({
     url: path,
+
+    // ⬅ OPTIONS sẽ override header mặc định 
+    // Ví dụ login: { headers: { Authorization: "" } }
     ...options,
-    data: options.data, // ⬅ không stringify nữa
   });
 
   return response.data;
 }
 
-// Helper riêng cho FormData (file upload)
-// Helper riêng cho FormData (file upload) hỗ trợ PUT/POST
+// 👉 Dùng riêng cho FormData
 export async function postFormData<T = any>(
   path: string,
   formData: FormData,
-  method: 'POST' | 'PUT' = 'POST'
+  method: "POST" | "PUT" = "POST"
 ): Promise<T> {
   const res = await axios({
     url: `${BASE_URL}${path}`,
     method,
     data: formData,
     headers: {
-      Authorization: `Bearer ${CLIENT_TOKEN}`, // Multer nhận file
-      // KHÔNG set Content-Type, browser tự thêm multipart/form-data
+      Authorization: `Bearer ${CLIENT_TOKEN}`,
+      // KHÔNG set Content-Type
     },
   });
+
   return res.data as T;
 }
