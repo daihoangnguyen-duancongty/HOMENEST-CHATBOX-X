@@ -50,7 +50,7 @@ export default class AdminController {
       }
 
       // Sinh clientId duy nhất bằng UUID
-      let newClientId =  nanoid(12);;
+      let newClientId =  nanoid(12);
 let exists = true;
 
 while (exists) {

@@ -15,58 +15,58 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 // ──────────────────────────────────────────────────────────────
 //
 
-export const adminCreateClientUser = async (req: Request, res: Response) => {
-  try {
-    const { clientId, username, password, name, avatar, ai_provider, api_keys, meta } = req.body;
+// export const adminCreateClientUser = async (req: Request, res: Response) => {
+//   try {
+//     const { clientId, username, password, name, avatar, ai_provider, api_keys, meta } = req.body;
 
-    if (!clientId || !username || !password || !name)
-      return res.status(400).json({ error: 'Missing fields' });
+//     if (!clientId || !username || !password || !name)
+//       return res.status(400).json({ error: 'Missing fields' });
 
-    const exists = await UserModel.findOne({ username, clientId });
-    if (exists) return res.status(400).json({ error: 'Username already exists' });
+//     const exists = await UserModel.findOne({ username, clientId });
+//     if (exists) return res.status(400).json({ error: 'Username already exists' });
 
-    // Tạo client-owner
-    const user = await UserModel.create({
-      userId: uuidv4(),
-      clientId,
-      username,
-      password,
-      name,
-      avatar,
-      role: 'client',
-    });
+//     // Tạo client-owner
+//     const user = await UserModel.create({
+//       userId: uuidv4(),
+//       clientId,
+//       username,
+//       password,
+//       name,
+//       avatar,
+//       role: 'client',
+//     });
 
-    // Tính trial 2 tháng
-    const now = new Date();
-    const trialEnd = new Date();
-    trialEnd.setMonth(trialEnd.getMonth() + 2);
+//     // Tính trial 2 tháng
+//     const now = new Date();
+//     const trialEnd = new Date();
+//     trialEnd.setMonth(trialEnd.getMonth() + 2);
 
-    // Cập nhật client collection
-    const client = await ClientModel.findOne({ clientId });
-    if (!client) {
-      await ClientModel.create({
-        clientId,
-        name,
-        ai_provider: ai_provider || 'openai',
-        api_keys: api_keys || {},
-        meta: meta || {},
-        user_count: 1,
-        active: true,
-        trial: true,
-        // trial_end: trialEnd,
-        trial_end: null, // vĩnh viễn
-      });
-    } else {
-      // Nếu client đã tồn tại → chỉ tăng user_count
-      client.user_count = (client.user_count || 0) + 1;
-      await client.save();
-    }
+//     // Cập nhật client collection
+//     const client = await ClientModel.findOne({ clientId });
+//     if (!client) {
+//       await ClientModel.create({
+//         clientId,
+//         name,
+//         ai_provider: ai_provider || 'openai',
+//         api_keys: api_keys || {},
+//         meta: meta || {},
+//         user_count: 1,
+//         active: true,
+//         trial: true,
+//         // trial_end: trialEnd,
+//         trial_end: null, // vĩnh viễn
+//       });
+//     } else {
+//       // Nếu client đã tồn tại → chỉ tăng user_count
+//       client.user_count = (client.user_count || 0) + 1;
+//       await client.save();
+//     }
 
-    return res.json({ ok: true, userId: user.userId });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
-  }
-};
+//     return res.json({ ok: true, userId: user.userId });
+//   } catch (err: any) {
+//     return res.status(500).json({ error: err.message });
+//   }
+// };
 
 //
 // ──────────────────────────────────────────────────────────────
