@@ -1,9 +1,10 @@
 declare namespace Express {
   interface User {
+    userId: string;
+    clientId: string;
+    name?: string;
+    avatar?: string;
     role: string;
-    // thêm các field khác nếu bạn có, ví dụ:
-    // id: string;
-    // email: string;
   }
 
   interface Request {

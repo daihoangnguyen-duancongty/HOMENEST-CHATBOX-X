@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IChatMessage {
-  from: 'user' | 'bot';
-  text: string;
-  timestamp?: Date;
+      from: "customer" | "bot" | "employee",
+    text: String,
+    timestamp: Date
+
 }
 
 export interface IChat extends Document {
@@ -24,7 +25,7 @@ const ChatSchema: Schema<IChat> = new Schema(
     userAvatar: { type: String },
     messages: [
       {
-        from: { type: String, enum: ['user', 'bot'], required: true },
+       from: { type: String, enum: ['customer', 'employee', 'bot'], required: true },
         text: { type: String, required: true },
         timestamp: { type: Date, default: Date.now },
       },
