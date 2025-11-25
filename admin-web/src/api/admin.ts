@@ -22,7 +22,7 @@ export const getClientById = async (clientId: string): Promise<IClient> => {
 export const createClient = async (
   payload: Partial<IClient>,
 ): Promise<IClient> => {
-  const data = await fetcher(`${ADMIN_PREFIX}/create-client-user`, {
+  const data = await fetcher(`${ADMIN_PREFIX_STATS}/clients`, {
     method: 'POST',
     data: payload,
   });

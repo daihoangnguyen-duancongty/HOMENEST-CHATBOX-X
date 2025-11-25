@@ -30,152 +30,182 @@ export default class AdminController {
     }
   }
 
+
   // CREATE CLIENT
-  static async createClient(req: Request, res: Response) {
-    try {
-      const data = req.body;
-      const file = req.file;
+static async createClient(req: Request, res: Response) {
+  try {
+    const data = req.body;
+    const file = req.file;
 
-      // Upload avatar nếu có
-      let avatarUrl = '';
-      if (file) {
-        const result: UploadApiResponse = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: 'homenest/homenest-chatbotx-client' },
-            (error, result) => (error ? reject(error) : resolve(result!))
-          );
-          stream.end(file.buffer);
-        });
-        avatarUrl = result.secure_url;
-      }
+    // Upload avatar nếu có
+    let avatarUrl = '';
+    if (file) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'homenest/homenest-chatbotx-client' },
+          (error, result) => (error ? reject(error) : resolve(result!))
+        );
+        stream.end(file.buffer);
+      });
+      avatarUrl = result.secure_url;
+    }
 
-      // Sinh clientId duy nhất bằng UUID
-      let newClientId =  nanoid(12);
-let exists = true;
+    // Check username duy nhất
+    const checkUser = await UserModel.findOne({ username: data.username });
+    if (checkUser) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
 
-while (exists) {
-  newClientId = nanoid(12);
-  const found = await ClientModel.findOne({ clientId: newClientId });
-  exists = !!found; // <-- convert document | null thành boolean
+    // Sinh clientId
+    let newClientId = nanoid(12);
+    while (await ClientModel.findOne({ clientId: newClientId })) {
+      newClientId = nanoid(12);
+    }
+
+    // Parse
+    const apiKeys = typeof data.api_keys === "string" ? JSON.parse(data.api_keys) : data.api_keys;
+    const meta = typeof data.meta === "string" ? JSON.parse(data.meta) : data.meta;
+
+    const userCount = Number(data.user_count) || 1;
+
+    const plan = await SubscriptionPlanModel.findById(data.subscription_plan);
+    if (!plan) return res.status(400).json({ error: "Gói subscription không tồn tại" });
+
+    // Tạo client
+    const newClient = await ClientModel.create({
+      clientId: newClientId,
+      name: data.name,
+      domain: data.domain,
+      avatar: avatarUrl,
+      color: data.color,
+      ai_provider: data.ai_provider,
+      welcome_message: data.welcome_message,
+      api_keys: apiKeys,
+      meta: meta,
+      user_count: userCount,
+
+      // GIỮ ĐÚNG THEO SCHEMA — EMBED
+      subscription_plan: {
+        name: plan.name,
+        max_users: plan.max_users,
+        max_files: plan.max_files,
+        price: plan.price,
+      },
+    });
+
+    // Tạo user owner
+    const user = await UserModel.create({
+      userId: uuidv4(),
+      username: data.username,
+      name: data.name,
+      password: data.password,
+      role: "client",
+      clientId: newClientId,
+      avatar: avatarUrl,
+    });
+
+    return res.json({ ok: true, client: newClient, user });
+
+  } catch (err) {
+    console.error("Create client error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
 }
 
-      // Chuyển user_count sang number
-      const userCount = Number(data.user_count) || 1;
-
-      // Lấy gói subscription
-      const plan = await SubscriptionPlanModel.findById(data.subscription_plan);
-      if (!plan) return res.status(400).json({ error: 'Gói subscription không tồn tại' });
-
-      // Tạo client
-      const newClient = await ClientModel.create({
-        clientId: newClientId, // ← sử dụng UUID
-        name: data.name,
-        avatar: avatarUrl,
-        user_count: userCount,
-        ai_provider: data.ai_provider,
-        api_keys: data.api_keys,
-        meta: data.meta,
-        color: data.color,
-        subscription_plan: {
-          name: plan.name,
-          max_users: plan.max_users,
-          max_files: plan.max_files,
-          price: plan.price,
-        },
-      });
-
-      // Tạo User client own
-      const user = await UserModel.create({
-        userId: uuidv4(),
-        username: data.username,
-        name: data.name,
-        password: data.password,
-        role: 'client',
-        clientId: newClientId, // ← liên kết với clientId mới
-        avatar: avatarUrl,
-      });
-
-      return res.json({ ok: true, client: newClient, user });
-    } catch (err) {
-      console.error('Create client error:', err);
-      return res.status(500).json({ error: 'Server error' });
-    }
-  }
   // UPDATE CLIENT
-  static async updateClient(req: Request, res: Response) {
-    try {
-      const data = req.body;
-      const file = req.file;
+ static async updateClient(req: Request, res: Response) {
+  try {
+    const clientId = req.params.clientId;
+    const data = req.body;
+    const file = req.file;
 
-      // 1️⃣ Upload avatar nếu có
-      let avatarUrl = '';
-      if (file) {
-        const result: UploadApiResponse = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: 'homenest/homenest-chatbotx-client' },
-            (error, result) => (error ? reject(error) : resolve(result!))
-          );
-          stream.end(file.buffer);
-        });
-        avatarUrl = result.secure_url;
-      }
-
-      // 2️⃣ Lấy subscription plan nếu gửi lên
-      let planObj: any = undefined;
-      if (data.subscription_plan) {
-        const plan = await SubscriptionPlanModel.findById(data.subscription_plan);
-        if (!plan) return res.status(400).json({ error: 'Gói subscription không tồn tại' });
-
-        planObj = {
-          name: plan.name,
-          max_users: plan.max_users,
-          max_files: plan.max_files,
-          price: plan.price,
-        };
-      }
-
-      // 3️⃣ Chuyển user_count sang number nếu có
-      const userCount = data.user_count ? Number(data.user_count) : undefined;
-
-      // 4️⃣ Build object update cho Client giống createClient
-      const updateData: any = {};
-      if (data.name) updateData.name = data.name;
-      if (data.color) updateData.color = data.color;
-      if (data.meta) updateData.meta = data.meta;
-      if (data.ai_provider) updateData.ai_provider = data.ai_provider;
-      if (planObj) updateData.subscription_plan = planObj;
-      if (avatarUrl) updateData.avatar = avatarUrl;
-      if (userCount !== undefined) updateData.user_count = userCount;
-      console.log('Update data:', updateData);
-      // 5️⃣ Update client
-      const client = await ClientModel.findOneAndUpdate(
-        { clientId: req.params.clientId },
-        updateData,
-        { new: true }
-      );
-
-      if (!client) return res.status(404).json({ error: 'Client not found' });
-
-      // 6️⃣ Update User tương ứng
-      const userUpdateData: any = {};
-      if (data.username) userUpdateData.username = data.username;
-      if (data.name) userUpdateData.name = data.name;
-      if (data.password) userUpdateData.password = data.password;
-      if (avatarUrl) userUpdateData.avatar = avatarUrl;
-
-      const userResult = await UserModel.updateOne(
-        { clientId: req.params.clientId, role: 'client' },
-        { $set: userUpdateData }
-      );
-
-      console.log('USER UPDATE RESULT:', userResult);
-
-      return res.json({ ok: true, client });
-    } catch (err) {
-      console.error('Update client error:', err);
-      return res.status(500).json({ error: 'Server error' });
+    const client = await ClientModel.findOne({ clientId });
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
     }
+
+    // Upload avatar nếu có
+    if (file) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "homenest/homenest-chatbotx-client" },
+          (error, result) => (error ? reject(error) : resolve(result!))
+        );
+        stream.end(file.buffer);
+      });
+      client.avatar = result.secure_url;
+    }
+
+    // Update các field nếu có
+    if (data.name) client.name = data.name;
+    if (data.domain) client.domain = data.domain;
+    if (data.color) client.color = data.color;
+    if (data.ai_provider) client.ai_provider = data.ai_provider;
+    if (data.welcome_message) client.welcome_message = data.welcome_message;
+
+    // api_keys
+    if (data.api_keys) {
+      let apiKeys = data.api_keys;
+      if (typeof apiKeys === "string") {
+        try {
+          apiKeys = JSON.parse(apiKeys);
+        } catch {
+          return res.status(400).json({ error: "api_keys invalid JSON" });
+        }
+      }
+      client.api_keys = apiKeys;
+    }
+
+    // meta
+    if (data.meta) {
+      let meta = data.meta;
+      if (typeof meta === "string") {
+        try {
+          meta = JSON.parse(meta);
+        } catch {
+          return res.status(400).json({ error: "meta invalid JSON" });
+        }
+      }
+
+      // MERGE META – không xoá dữ liệu cũ
+      client.meta = {
+        ...client.meta,
+        ...meta,
+      };
+    }
+
+    // user_count
+    if (data.user_count) {
+      const count = Number(data.user_count);
+      if (!isNaN(count)) client.user_count = count;
+    }
+
+    // Update subscription plan (EMBED)
+    if (data.subscription_plan) {
+      const plan = await SubscriptionPlanModel.findById(data.subscription_plan);
+      if (!plan) return res.status(400).json({ error: "Subscription plan not found" });
+
+      client.subscription_plan = {
+        name: plan.name,
+        max_users: plan.max_users,
+        max_files: plan.max_files,
+        price: plan.price,
+      };
+    }
+
+    await client.save();
+
+    return res.json({
+      ok: true,
+      message: "Client updated successfully",
+      client,
+    });
+
+  } catch (err) {
+    console.error("Update client error:", err);
+    return res.status(500).json({ error: "Server error" });
   }
+}
 
   // DELETE CLIENT
   static async deleteClient(req: Request, res: Response) {
