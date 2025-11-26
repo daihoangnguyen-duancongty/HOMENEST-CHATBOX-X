@@ -1,8 +1,15 @@
 import { fetcher } from '@/config/fetcher';
-import type { DashboardStats, IClient, ISubscriptionPlan } from '@/types/client-owner-types';
+import type { DashboardStats, IClient, ISubscriptionPlan,IMessage,ICustomer } from '@/types/client-owner-types';
 
 const ADMIN_PREFIX = '/api/admin';
 const ADMIN_PREFIX_STATS = '/admin-api';
+const CHAT_PREFIX = '/api/client/chat';
+/**
+ * Lấy lịch sử chat của 1 customer
+ * @param clientId Id của client
+ * @param customerId Id của customer
+ * @returns Danh sách messages
+ */
 
 // Dashboard
 export const getDashboardStats = async (): Promise<DashboardStats> =>
@@ -99,4 +106,29 @@ export const deletePlan = async (id: string) => {
   return data.ok;
 };
 
+//CHAT
+export const getCustomers = async (): Promise<ICustomer[]> => {
+  const data = await fetcher('/api/customer/customers');
+  return data.customers;
+};
 
+export const getMessages = async (clientId: string, customerId: string): Promise<IMessage[]> => {
+  const data = await fetcher(`${CHAT_PREFIX}/${clientId}/${customerId}`);
+  return data.messages || [];
+};
+
+export const sendMessage = async (customerId: string, message: string) => {
+  const data = await fetcher('/api/client/reply', {
+    method: 'POST',
+    data: { customerId, message },
+  });
+  return data.ok;
+};
+
+export const switchCustomerToHuman = async (customerId: string) => {
+  const data = await fetcher('/api/customer/switch-human', {
+    method: 'POST',
+    data: { customer_id: customerId },
+  });
+  return data.ok;
+};

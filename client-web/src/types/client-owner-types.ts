@@ -62,3 +62,16 @@ export type ISubscriptionPlan = {
   created_at?: string;
   updated_at?: string;
 };
+export interface IMessage {
+  _id: string;
+  from: 'customer' | 'bot' | 'employee';
+  text: string;
+  timestamp: string;
+}
+
+export interface ICustomer {
+  customerId: string;
+  name: string;
+  avatar: string;
+  chatMode: 'bot' | 'human';
+}
