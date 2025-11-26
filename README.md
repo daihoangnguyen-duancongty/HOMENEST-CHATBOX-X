@@ -1,6 +1,7 @@
 # Build Chatbot plugin wordpress
 
 cd lần lượt vào thư mục admin-web, chatbot, client-wev sau đó chạy để build widget-frontend và các dashboard ra thành file js,css dùng cho plugin wordpress :
+
 npm run build
 
 # Nhúng vào Wordpress

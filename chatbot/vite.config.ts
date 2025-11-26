@@ -63,7 +63,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/main.tsx'),
       name: 'HomenestChatWidget',
-      fileName: () => 'widget.js',
+      fileName: () => 'bundle.js',
       formats: ['iife']
     },
     rollupOptions: {
