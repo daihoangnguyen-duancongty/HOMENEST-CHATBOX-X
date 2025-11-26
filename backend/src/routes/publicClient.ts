@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ClientModel } from "../models/Client";
+import { CustomerModel } from "../models/Customer";
 
 const router = Router();
 
@@ -20,6 +21,12 @@ router.get("/:clientId", async (req, res) => {
      const message = err instanceof Error ? err.message : String(err);
   res.status(500).json({ error: "Server error", detail: message });
   }
+});
+// lay danh sach customer
+router.get("/public/customers/:clientId", async (req, res) => {
+  const { clientId } = req.params;
+  const customers = await CustomerModel.find({ clientId });
+  res.json({ customers });
 });
 
 export default router;

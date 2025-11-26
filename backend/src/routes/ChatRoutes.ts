@@ -11,7 +11,7 @@ import {
 
 import { ClientModel } from "../models/Client";
 import { ChatModel } from "../models/Chat";
-import { CustomerModel } from "../models/Customer";
+
 
 const router = Router();
 
@@ -70,12 +70,5 @@ router.post(
  requireRole("client", "employee"),
   employeeReply
 );
-//6)lấy danh sách tất cả customer đã chat
-router.get("/customers", authMiddleware, async (req: AuthRequest, res) => {
-  const clientId = req.user?.clientId;
-  if (!clientId) return res.status(400).json({ error: "Missing clientId" });
 
-  const customers = await CustomerModel.find({ clientId });
-  res.json({ customers });
-});
 export default router;
