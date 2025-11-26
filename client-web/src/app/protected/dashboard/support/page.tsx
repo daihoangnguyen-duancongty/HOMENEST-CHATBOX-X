@@ -28,7 +28,7 @@ export default function SupportPage() {
 
   return (
     <div className='p-6'>
-      <h1 className='text-2xl font-bold mb-4'>Liên hệ hỗ trợ</h1>
+      <h1 className='text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text'>Liên hệ hỗ trợ</h1>
 
       <form onSubmit={submit} className='space-y-4'>
         <textarea

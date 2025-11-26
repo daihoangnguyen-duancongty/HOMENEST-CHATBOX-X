@@ -7,9 +7,13 @@ import { FiSend, FiPaperclip, FiSmile, FiSettings, FiX,FiLink } from 'react-icon
 import { getChatHistory, sendMessageToAI } from '../apis/chatApi';
 
 
-export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => {
-  const botIcon =
-    'https://homenest.com.vn/wp-content/uploads/2025/06/middle.webp';
+
+export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint, visitorId: initialVisitorId  }) => {
+ const [clientInfo, setClientInfo] = useState<any>(null);
+
+const botIcon =
+  clientInfo?.avatar ||
+  "https://homenest.com.vn/wp-content/uploads/2025/06/middle.webp";
   const userAvatar = 'https://img.freepik.com/vector-mien-phi/v%C3%B2ng-tr%C3%B2n-m%C3%A0u-xanh-v%E1%BB%9Bi-ng%C6%B0%E1%BB%9Di-d%C3%B9ng-m%C3%A0u-tr%E1%BA%AFng_78370-4707.jpg?semt=ais_hybrid&w=740&q=80';
 
   const [open, setOpen] = useState(false);
@@ -24,40 +28,101 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
     { label: 'Liên hệ CSKH', payload: 'lien_he' },
     { label: 'FAQ nhanh', payload: 'faq' },
   ]);
-
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const backend = apiEndpoint || '';
 
-  // scroll khi messages thay đổi
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+//Fetch client info khi load widget
+useEffect(() => {
+  const loadClientInfo = async () => {
+    if (!clientId) return;
+
+    const res = await fetch(`${backend}/public/client/${clientId}`);
+    const data = await res.json();
+    setClientInfo(data);
   };
-  useEffect(scrollToBottom, [messages]);
+  loadClientInfo();
+}, [clientId, backend]);
+
+  // scroll khi messages thay đổi
+const visitorIdKey = `chat_${clientId}_session`;
+  const [visitorId, setVisitorId] = useState<string | null>(initialVisitorId || null);
+
+
+// Tạo hoặc load visitorId từ localStorage
+
+useEffect(() => {
+  if (!visitorId) {
+    let currentId = localStorage.getItem(visitorIdKey);
+    if (!currentId) {
+      currentId = crypto.randomUUID();
+      localStorage.setItem(visitorIdKey, currentId);
+    }
+    setVisitorId(currentId);
+  }
+}, [clientId, visitorId]);
+
+const scrollToBottom = () => {
+messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+};
+useEffect(scrollToBottom, [messages]);
 
   // load lịch sử chat khi mount
-  useEffect(() => {
-    const fetchHistory = async () => {
-      const history = await getChatHistory(clientId, backend);
-      if (history.length > 0) {
-        setMessages(history);
-      } else {
-        setMessages([{ from: 'bot', text: 'Chào mừng bạn trở lại với HOMENEST CHATBOT X 😊' }]);
-      }
-    };
-    fetchHistory();
-  }, [clientId, backend]);
+ useEffect(() => {
+   if (!clientInfo || !visitorId) return;
+  const fetchHistory = async () => {
+    const history = await getChatHistory(clientId, visitorId!, backend);
+    if (history.length > 0) {
+      setMessages(history);
+    } else {
+      setMessages([{
+  from: 'bot', 
+  text: clientInfo?.welcome_message || "Xin chào! Mình có thể giúp gì?"
+}]);
+    }
+  };
+  fetchHistory();
+}, [clientInfo,clientId, visitorId, backend]);
+
+
 
   // gửi tin nhắn
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    const userMsg: ChatMessage = { from: 'user', text };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setTyping(true);
-    const reply = await sendMessageToAI(clientId, text, backend);
+ const sendMessage = async (text: string) => {
+  if (!text.trim()) return;
+  const userMsg: ChatMessage = { from: 'user', text };
+  setMessages(prev => [...prev, userMsg]);
+  setInput('');
+  setTyping(true);
+
+  // Gọi API visitor
+  try {
+    const res = await fetch(`${backend}/customer/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: clientId,
+        customer_id: visitorId, // <- dùng sessionId
+        name: 'Guest',
+        avatar: '',
+        message: text,
+      }),
+    });
+
+    const data = await res.json();
     setTyping(false);
-    setMessages(prev => [...prev, { from: 'bot', text: reply }]);
-  };
+
+    // Lưu visitorId mới nếu backend trả
+    if (data.customer_id) {
+      localStorage.setItem(`chat_${clientId}_session`, data.customer_id);
+    }
+
+    setMessages(prev => [...prev, { from: 'bot', text: data.reply }]);
+  } catch (err) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error("sendMessage error:", message);
+    setTyping(false);
+    setMessages(prev => [...prev, { from: 'bot', text: "Lỗi kết nối server." }]);
+  }
+};
 
   const handleQuickAction = (action: { label: string; payload: string }) => sendMessage(action.payload);
 
@@ -101,10 +166,10 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
       {open && (
         <div className="chat-widget-popup">
           {/* Header */}
-          <div className="chat-widget-header">
+          <div className="chat-widget-header"  style={{ background: clientInfo?.color || "#0b74ff" }}>
             <div className="chat-widget-header-left">
-              <img src={userAvatar} alt="User" className="chat-widget-header-avatar" />
-              <span>CHATBOT X</span>
+              <img src={clientInfo?.logo_url || clientInfo?.avatar || userAvatar} alt="User" className="chat-widget-header-avatar" />
+    <span>{clientInfo?.name || "CHATBOT X"}</span>
             </div>
             <div className="chat-widget-header-right">
               <div className="chat-widget-settings-wrapper">
@@ -132,7 +197,9 @@ export const ChatWidget: React.FC<WidgetProps> = ({ clientId, apiEndpoint }) => 
             {messages.map((m, i) => (
               <div key={i} className={`chat-widget-message-wrapper ${m.from === 'user' ? 'user' : 'bot'}`}>
                 <img
-                  src={m.from === 'bot' ? botIcon : userAvatar}
+                 src={m.from === 'bot' 
+    ? (clientInfo?.avatar || botIcon) 
+    : userAvatar }
                   alt={m.from}
                   className="chat-widget-message-avatar"
                 />

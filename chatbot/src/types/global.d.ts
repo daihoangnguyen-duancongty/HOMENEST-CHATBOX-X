@@ -2,9 +2,9 @@ export {};
 
 declare global {
   interface Window {
-    ABC_CHATBOT_WIDGET: {
+    HOMENEST_CHATBOT_WIDGET: {
       apiEndpoint?: string;
-      token: string | null;
+       token?: string | null;
       clientId: string | null;
     };
   }

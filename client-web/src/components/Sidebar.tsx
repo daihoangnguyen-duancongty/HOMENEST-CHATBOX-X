@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authSlice';
 import { useRouter } from 'next/navigation';
 import Account from '@/components/Account';
-import { FaHome, FaBook, FaUsers, FaBoxOpen, FaBrain } from 'react-icons/fa';
+import { FaHome, FaBook, FaUsers, FaBoxOpen, FaBrain,FaCog } from 'react-icons/fa';
 
 interface SidebarProps {
   className?: string;
@@ -70,7 +70,17 @@ export default function Sidebar({ className }: SidebarProps) {
             </Link>
           </li>
         )}
-
+{/* Cài đặt chatbot – ONLY CLIENT */}
+{isClient && (
+  <li>
+    <Link
+      href='/protected/dashboard/settings'
+      className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
+    >
+       <FaCog /> Cài đặt
+    </Link>
+  </li>
+)}
         {/*  Plans – ONLY CLIENT */}
         {isClient && (
           <li>

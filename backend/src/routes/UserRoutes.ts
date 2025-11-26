@@ -14,8 +14,12 @@ import { authMiddleware } from '../middlewares/auth';
 import { requireRole } from '../middlewares/role';
 import { adminAuth } from '../middlewares/adminAuth';
 import { clientSendSupport } from "../controllers/UserController";
+import { customerChat, switchToHuman, employeeReply } from "../controllers/ChatController";
 
 const router = Router();
+
+// Login chung
+router.post('/login', loginUser);
 
 // Admin tạo Client Owner
 // router.post('/admin/create-client-user', adminAuth, clientCreateEmployee);
@@ -34,8 +38,7 @@ router.post(
   requireRole("client"),
   clientSendSupport
 );
-
-// Login chung
-router.post('/login', loginUser);
+// ===== EMPLOYEE CHAT =====
+router.post('/client/reply', authMiddleware, employeeReply); // Employee reply, cần JWT
 
 export default router;

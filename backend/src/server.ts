@@ -16,6 +16,7 @@ import chatRoutes from './routes/ChatRoutes';
 import adminRoutes from './routes/AdminRoutes';
 import userRoutes from './routes/UserRoutes';
 import adminAuthRoutes from './routes/AdminAuthRoutes';
+import customerChatRoutes from "./routes/CustomerChatRoutes";
 
 import { seedPlans } from './services/seedPlans';
 
@@ -65,7 +66,8 @@ app.use('/api', chatRoutes);
 app.use('/api', userRoutes);
 app.use('/admin-api', adminRoutes);
 app.use('/admin-api/auth', adminAuthRoutes);
-
+app.use("/api/customer", customerChatRoutes);
+app.use("/public/client", require("./routes/publicClient").default);
 // ----------------- Apollo Server -----------------
 const startApolloServer = async () => {
   const server = new ApolloServer({ typeDefs: schema, resolvers });

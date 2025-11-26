@@ -40,7 +40,7 @@ export default function DocumentsPage() {
   return (
     <div className='flex min-h-screen '>
       <main className='flex-1 ml-4 p-8 overflow-auto'>
-        <h1 className='text-4xl font-extrabold mb-8 text-gray-900'>
+        <h1 className='text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text'>
           Hướng dẫn sử dụng hệ thống Client
         </h1>
 

@@ -17,15 +17,21 @@ interface GetMessagesResponse {
  * @param message nội dung tin nhắn
  * @param backend backend URL
  */
-export const getChatHistory = async (clientId: string, backend: string = BASE_URL) => {
+export const getChatHistory = async (clientId: string, visitorId: string, backend: string) => {
   try {
-    const res = await axios.get(`${backend}/chat/${clientId}`);
-    return res.data.messages || [];
+    const res = await fetch(`${backend}/customer/chat/history`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: clientId, customer_id: visitorId }),
+    });
+    const data = await res.json();
+    return data.messages || [];
   } catch (err) {
-    console.error('getChatHistory error:', err);
+    console.error("getChatHistory error:", err);
     return [];
   }
 };
+
 export const sendMessageToAI = async (
   clientId: string,
   message: string,

@@ -66,7 +66,7 @@ export default function SubscriptionsPage() {
       )}
 
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-4xl font-extrabold text-gray-900'>Gói sản phẩm</h1>
+        <h1 className='text-3xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text'>Gói sản phẩm</h1>
         <button
           onClick={handleCreate}
           className='px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white font-semibold rounded-xl shadow-lg hover:from-indigo-600 hover:via-purple-700 hover:to-pink-600 transform hover:scale-105 transition duration-300'
