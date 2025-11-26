@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import multer from 'multer';
+import { SupportTicketModel } from "../models/SupportTicket";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
@@ -189,4 +190,30 @@ export const clientDeleteEmployee = async (req: any, res: Response) => {
   }
 
   return res.json({ ok: true, message: 'Employee deleted' });
+};
+
+// =========================
+// 4) SENT SUPPORT
+// =========================
+
+export const clientSendSupport = async (req: any, res: any) => {
+  try {
+    const { message } = req.body;
+    const clientId = req.user?.clientId;
+
+    if (!message) {
+      return res.status(400).json({ error: "Vui lòng nhập nội dung hỗ trợ" });
+    }
+
+    const ticket = await SupportTicketModel.create({
+      ticketId: uuidv4(),
+      clientId,
+      message,
+    });
+
+    return res.json({ ok: true, ticket });
+  } catch (err) {
+    console.error("Support error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
 };

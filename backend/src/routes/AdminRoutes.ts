@@ -23,6 +23,13 @@ router.get('/plans', adminAuth, AdminController.getPlans);
 router.post('/plans', adminAuth, AdminController.createPlan);
 router.put('/plans/:id', adminAuth, AdminController.updatePlan);
 router.delete('/plans/:id', adminAuth, AdminController.deletePlan);
+// Support
+router.get(
+  "/admin/support-tickets",
+  adminAuth,
+  AdminController.getSupportTickets
+);
+router.post('/admin-api/support-tickets/:ticketId/reply', AdminController.replySupportTicket);
 // stats
 router.get('/dashboard', adminAuth, AdminController.getDashboard);
 

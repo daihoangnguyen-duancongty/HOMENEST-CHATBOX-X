@@ -88,6 +88,17 @@ export default function Sidebar({ className }: SidebarProps) {
             </Link>
           </li>
         )}
+         {/*  Support – ONLY CLIENT */}
+{isClient && (
+  <li>
+    <Link
+      href='/protected/dashboard/support'
+      className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
+    >
+      📩 Liên hệ hỗ trợ
+    </Link>
+  </li>
+)}
 
       </ul>
 

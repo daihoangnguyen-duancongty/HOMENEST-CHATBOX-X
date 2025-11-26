@@ -3,6 +3,7 @@ import { ClientModel } from '../models/Client';
 import { UserModel } from '../models/User';
 import { ClientLogModel } from '../models/ClientLog';
 import { SubscriptionPlanModel } from '../models/SubscriptionPlan';
+import { SupportTicketModel } from '../models/SupportTicket';
 import cloudinary from '../config/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { nanoid } from 'nanoid';
@@ -336,6 +337,53 @@ static async createClient(req: Request, res: Response) {
     await SubscriptionPlanModel.findByIdAndDelete(req.params.id);
     return res.json({ ok: true });
   }
+    // =========================
+  // SUPPORT TICKETS
+  // =========================
+  static async getSupportTickets(req: Request, res: Response) {
+    try {
+      const tickets = await SupportTicketModel.find().sort({ created_at: -1 });
+
+      return res.json({ ok: true, tickets });
+    } catch (err) {
+      console.error("Get support tickets error:", err);
+      return res.status(500).json({ error: "Server error" });
+    }
+  }
+// POST /admin-api/support-tickets/:ticketId/reply
+static async replySupportTicket(req: Request, res: Response) {
+  try {
+    const { ticketId } = req.params;
+    const { message } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    const ticket = await SupportTicketModel.findOne({ ticketId });
+    if (!ticket) {
+      return res.status(404).json({ error: "Support ticket not found" });
+    }
+
+    // Nếu ticket chưa có responses array thì khởi tạo
+    if (!ticket.responses) ticket.responses = [];
+
+    // Thêm phản hồi của admin
+    ticket.responses.push({
+      message: message.trim(),
+      admin: true,
+      created_at: new Date(),
+    });
+
+    await ticket.save();
+
+    return res.json({ ok: true, ticket });
+  } catch (err: any) {
+    console.error("Reply support ticket error:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+}
+
   // GET DASHBOARD STATS
   static async getDashboard(req: Request, res: Response) {
     try {

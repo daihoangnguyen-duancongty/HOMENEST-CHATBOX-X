@@ -13,6 +13,7 @@ import AdminController from '../controllers/AdminController';
 import { authMiddleware } from '../middlewares/auth';
 import { requireRole } from '../middlewares/role';
 import { adminAuth } from '../middlewares/adminAuth';
+import { clientSendSupport } from "../controllers/UserController";
 
 const router = Router();
 
@@ -26,7 +27,13 @@ router.get('/client/employees', authMiddleware, requireRole('client'), clientGet
 router.get('/client/employees/:userId', authMiddleware, requireRole('client'), clientGetEmployee);
 router.put('/client/employees/:userId', authMiddleware, requireRole('client'), uploadAvatar.single('avatar'), clientUpdateEmployee);
 router.delete('/client/employees/:userId', authMiddleware, requireRole('client'), clientDeleteEmployee);
-
+// Client gửi hỗ trợ
+router.post(
+  "/client/support",
+  authMiddleware,
+  requireRole("client"),
+  clientSendSupport
+);
 
 // Login chung
 router.post('/login', loginUser);

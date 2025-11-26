@@ -98,3 +98,15 @@ export const deletePlan = async (id: string) => {
   });
   return data.ok;
 };
+// Xem va trả lời danh sách hỗ trợ
+export const getSupportTickets = async () => {
+  const data = await fetcher(`/admin-api/support-tickets`);
+  return data.tickets;
+};
+export const replySupportTicket = async (ticketId: string, message: string) => {
+  const data = await fetcher(`/admin-api/support-tickets/${ticketId}/reply`, {
+    method: 'POST',
+    data: { message },
+  });
+  return data.ticket;
+};

@@ -65,6 +65,14 @@ export default function Sidebar({ className }: SidebarProps) {
             <FaBrain /> Huấn luyện mô hình
           </Link>
         </li>
+        <li>
+  <Link
+    href='/protected/dashboard/support'
+    className='hover:bg-gray-700 p-2 rounded block flex items-center gap-2'
+  >
+    💬 Hỗ trợ
+  </Link>
+</li>
         {/* <li>
           <button
             onClick={handleLogout}
