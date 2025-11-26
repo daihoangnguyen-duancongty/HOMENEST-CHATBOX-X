@@ -23,7 +23,7 @@ router.get("/:clientId", async (req, res) => {
   }
 });
 // lay danh sach customer
-router.get("/public/customers/:clientId", async (req, res) => {
+router.get("/customers/:clientId", async (req, res) => {
   const { clientId } = req.params;
   const customers = await CustomerModel.find({ clientId });
   res.json({ customers });
