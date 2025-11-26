@@ -19,17 +19,23 @@ export async function fetcher<T = any>(
   path: string,
   options: AxiosRequestConfig = {}
 ): Promise<T> {
-  
+
+  const token = typeof window !== "undefined" 
+    ? localStorage.getItem("token")
+    : null;
+
   const response = await instance.request({
     url: path,
-
-    // ⬅ OPTIONS sẽ override header mặc định 
-    // Ví dụ login: { headers: { Authorization: "" } }
     ...options,
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+      ...options.headers,
+    },
   });
 
   return response.data;
 }
+
 
 // 👉 Dùng riêng cho FormData
 export async function postFormData<T = any>(

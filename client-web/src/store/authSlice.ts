@@ -1,4 +1,3 @@
-// src/store/authSlice.ts
 import { create } from "zustand";
 
 interface User {
@@ -18,11 +17,8 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  // Khởi tạo từ localStorage nếu có
-  token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
-  user: typeof window !== "undefined" && localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user")!)
-    : null,
+  token: null,
+  user: null,
 
   login: (token, user) => {
     set({ token, user });

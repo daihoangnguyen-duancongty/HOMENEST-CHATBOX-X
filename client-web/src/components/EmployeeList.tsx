@@ -67,10 +67,10 @@ export default function EmployeeList() {
           <table className="w-full border-collapse shadow-lg rounded-lg overflow-hidden">
             <thead className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
               <tr>
-                <th className="p-3 text-left">Avatar</th>
-                <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Username</th>
-                <th className="p-3 text-left">Actions</th>
+                <th className="p-3 text-left">Ảnh đại diện</th>
+                <th className="p-3 text-left">Họ tên</th>
+                <th className="p-3 text-left">Định danh</th>
+                <th className="p-3 text-left">Hành động</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
