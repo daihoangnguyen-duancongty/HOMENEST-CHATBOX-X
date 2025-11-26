@@ -25,7 +25,7 @@ export default defineConfig({
       closeBundle: async () => {
         const pluginDir = path.resolve(
           __dirname,
-          '../wordpress/wp-content/plugins/homenest-chatbot/assets'
+          '../wordpress/wp-content/plugins/chatbot/assets'
         );
 
         await fs.ensureDir(path.join(pluginDir, 'js'));
