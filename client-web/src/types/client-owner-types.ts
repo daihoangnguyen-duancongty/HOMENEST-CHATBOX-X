@@ -10,10 +10,18 @@ export type RegisterFormInputs = {
   name: string;
   avatar?: string;
 };
-
+export interface User {
+  _id: string;
+  userId: string;
+  username: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  clientId?: string; // thêm nếu cần lấy clientId
+}
 export type AuthState = {
   token: string | null;
-  user: any | null;
+  user: User | null;
   loginWithToken: (token: string) => void;
   logout: () => void;
 };

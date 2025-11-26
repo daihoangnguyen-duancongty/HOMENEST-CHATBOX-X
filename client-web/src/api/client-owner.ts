@@ -107,8 +107,9 @@ export const deletePlan = async (id: string) => {
 };
 
 //CHAT
-export const getCustomers = async (): Promise<ICustomer[]> => {
-  const data = await fetcher('/api/customer/customers');
+export const getCustomers = async (clientId: string): Promise<ICustomer[]> => {
+  if (!clientId) throw new Error('Missing clientId');
+  const data = await fetcher(`/public/client/customers/${clientId}`);
   return data.customers;
 };
 
