@@ -45,20 +45,23 @@ router.post("/register-wp-site", async (req, res) => {
       const clientId = crypto.randomBytes(6).toString("hex");
       const apiKey = crypto.randomBytes(16).toString("hex");
 
+      // <-- Đặt name mặc định nếu không gửi
       client = new ClientModel({
         clientId,
-        api_keys: apiKey,  // <- đổi apiKey thành api_keys
+        api_keys: apiKey,
         domain: cleanDomain,
         user_email: email,
+        name: `Client-${clientId}`,  // đây là default name
       });
+
       await client.save();
     }
 
-    // Trả về tên property frontend dễ dùng
     res.json({ clientId: client.clientId, apiKey: client.api_keys });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     res.status(500).json({ error: "Server error", detail: message });
   }
 });
+
 export default router;

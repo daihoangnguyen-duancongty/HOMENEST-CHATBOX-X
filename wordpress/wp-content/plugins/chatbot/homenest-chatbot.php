@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Chatbot X (HomeNest)
- * Description: Tự động tạo clientId + load widget React giống Tidio.
+ * Plugin Name: Chatbot X
+ * Description: Phần mềm plugin chatbot thông minh tích hợp trực tiếp vào website hoặc ứng dụng, giúp tự động hóa tương tác với khách hàng 24/7 
  * Version: 1.1
  * Author: HomeNest
  */
@@ -63,6 +63,16 @@ add_action('wp_enqueue_scripts', function () {
         '1.0'
     );
 
+
+
+    wp_enqueue_script(
+        'chatbotx-script',
+        CHATBOTX_URL . 'assets/js/widget.js',
+        [],
+        '1.0',
+        true
+    );
+    
     // Inject config
   wp_add_inline_script(
     'chatbotx-script',
@@ -74,13 +84,4 @@ add_action('wp_enqueue_scripts', function () {
     'before'
 );
 
-
-
-    wp_enqueue_script(
-        'chatbotx-script',
-        CHATBOTX_URL . 'assets/js/widget.js',
-        [],
-        '1.0',
-        true
-    );
 });
