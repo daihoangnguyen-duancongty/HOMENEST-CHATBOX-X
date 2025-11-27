@@ -32,7 +32,7 @@ export default defineConfig({
         await fs.ensureDir(path.join(pluginDir, 'css'));
 
         await fs.copyFile(
-          path.resolve(__dirname, 'dist/widget.js'),
+          path.resolve(__dirname, 'dist/bundle.js'),
           path.join(pluginDir, 'js/widget.js')
         );
 

@@ -9,4 +9,5 @@ export interface WidgetProps {
   clientId: string;
   apiEndpoint: string;
   visitorId?: string; // sessionId visitor
+  apiKey?: string;
 }
