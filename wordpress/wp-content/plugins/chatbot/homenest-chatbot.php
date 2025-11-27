@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Chatbot X
- * Description: Phần mềm plugin chatbot thông minh tích hợp trực tiếp vào website hoặc ứng dụng, giúp tự động hóa tương tác với khách hàng 24/7 
+ * Description: Phần mềm Chatbot thông minh tích hợp trực tiếp vào website hoặc ứng dụng, giúp tự động hóa tương tác với khách hàng 24/7 
  * Version: 1.1
  * Author: HomeNest
  */
@@ -21,7 +21,7 @@ register_activation_hook(__FILE__, function () {
     $adminEmail = get_option('admin_email');
 
     $response = wp_remote_post(
-        "https://homenest-chatbox-x-production.up.railway.app/api/public/register-wp-site",
+        "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
         [
             'method' => 'POST',
             'headers' => ['Content-Type' => 'application/json'],
@@ -29,6 +29,8 @@ register_activation_hook(__FILE__, function () {
                 "domain" => $siteUrl,
                 "email" => $adminEmail
             ])
+            
+       
         ]
     );
 

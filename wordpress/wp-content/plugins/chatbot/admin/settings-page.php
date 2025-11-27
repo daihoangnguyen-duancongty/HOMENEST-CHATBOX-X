@@ -11,7 +11,30 @@ add_action('admin_menu', function(){
         'dashicons-format-chat'
     );
 });
+add_action('init', function () {
+    if (!isset($_GET['test_chatbot_ping'])) return;
 
+    $response = wp_remote_post(
+        "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
+        [
+            'method' => 'POST',
+            'timeout' => 30,
+            'sslverify' => false,
+            'body' => json_encode([
+                'domain' => 'test.com',
+                'email' => 'test@test.com'
+            ]),
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ]
+        ]
+    );
+
+    echo "<pre>";
+    print_r($response);
+    echo "</pre>";
+    die;
+});
 function chatbotx_render_settings_page() {
     $clientId = get_option("chatbotx_client_id");
     $apiKey   = get_option("chatbotx_api_key");
@@ -33,29 +56,40 @@ function chatbotx_render_settings_page() {
                 $siteUrl = get_site_url();
 
                 $response = wp_remote_post(
-                    "https://homenest-chatbox-x-production.up.railway.app/api/public/register-wp-site",
-                    [
-                        'method' => 'POST',
-                        'headers' => ['Content-Type' => 'application/json'],
-                        'body' => json_encode([
-                            "domain" => $siteUrl,
-                            "email" => $email
-                        ]),
-                         'timeout' => 20,
-                    ]
-                );
+    "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
+    [
+        'method'    => 'POST',
+        'headers'   => ['Content-Type' => 'application/json'],
+        'body'      => json_encode([ "domain" => $siteUrl, "email" => $email ]),
+        'timeout'   => 120,
+        'sslverify' => false,
+    ]
+);
 
-                if (!is_wp_error($response)) {
-                    $data = json_decode(wp_remote_retrieve_body($response), true);
-                    if (!empty($data['clientId'])) update_option('chatbotx_client_id', $data['clientId']);
-                    if (!empty($data['apiKey'])) update_option('chatbotx_api_key', $data['apiKey']);
+if (is_wp_error($response)) {
+    echo '<div class="error notice"><p>Lỗi khi tạo client: ' . esc_html($response->get_error_message()) . '</p></div>';
+    
+    // In chi tiết debug
+    echo '<pre>';
+    echo "Error Data:\n";
+    print_r($response->get_error_data());
+    echo '</pre>';
 
-                    echo '<div class="updated notice"><p>Client mới đã được tạo!</p></div>';
-                    // Reload page để hiển thị dữ liệu
-                    echo '<meta http-equiv="refresh" content="1">';
-                } else {
-                    echo '<div class="error notice"><p>Lỗi khi tạo client: ' . esc_html($response->get_error_message()) . '</p></div>';
-                }
+    // In info cURL nếu cần
+    if (isset($response->errors['http_request_failed'])) {
+        echo '<pre>';
+        print_r($response->errors['http_request_failed']);
+        echo '</pre>';
+    }
+} else {
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    echo '<pre>';
+    echo "Response data:\n";
+    print_r($data);
+    echo '</pre>';
+}
+
+
             }
             ?>
         <?php else: ?>
