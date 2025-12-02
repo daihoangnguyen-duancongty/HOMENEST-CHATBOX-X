@@ -43,6 +43,9 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://homenest-chatbox-x.vercel.app',
+  'https://api.goquestx.com',
+  'http://admin.goquestx.com',
+  'http://dashboard.goquestx.com'
 ];
 
 app.use(

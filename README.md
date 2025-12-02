@@ -1,3 +1,66 @@
+
+
+
+
+================================================================SEVER=====================================================================
+
+✅ BƯỚC 2 – CHẠY 3 APP BẰNG PM2
+PM2 setup đúng cách cho frontend
+
+1️⃣ Admin-web
+
+cd /var/www/homenest-chatbot-x/admin-web
+npm install
+pm2 start npm --name "admin-web" -- start -- -p 3001
+
+
+2️⃣ Client-web
+
+cd /var/www/homenest-chatbot-x/client-web
+npm install
+pm2 start npm --name "client-web" -- start -- -p 3002
+
+
+3️⃣ Chatbot
+
+Nếu đã build bằng vite build trước đó:
+
+cd /var/www/homenest-chatbot-x/chatbot
+npm install
+pm2 start npm --name "chatbot" -- run preview -- --port 3003
+
+
+
+
+
+
+
+
+Kiểm tra
+pm2 list
+pm2 logs admin-web
+pm2 logs client-web
+pm2 logs chatbot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==================================================================LOCAL================================================================
 # Build Chatbot plugin wordpress
 
 cd lần lượt vào thư mục admin-web, chatbot, client-wev sau đó chạy để build widget-frontend và các dashboard ra thành file js,css dùng cho plugin wordpress :

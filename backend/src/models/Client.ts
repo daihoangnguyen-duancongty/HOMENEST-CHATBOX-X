@@ -18,6 +18,7 @@ export interface IClient extends Document {
     gemini?: string;
     [key: string]: string | undefined;
   };
+   key: string;
   active?: boolean;
   trial?: boolean;
   trial_end?: Date;
@@ -40,6 +41,7 @@ const ClientSchema: Schema<IClient> = new Schema({
   welcome_message: { type: String, default: 'Xin chào! Mình có thể giúp gì?' },
   ai_provider: { type: String, default: 'openai' },
   api_keys: { type: Schema.Types.Mixed, default: {} },
+  key: { type: String,required: true,unique: true,},
   created_at: { type: Date, default: Date.now },
   meta: { type: Schema.Types.Mixed, default: {} },
   user_count: { type: Number, default: 0 },

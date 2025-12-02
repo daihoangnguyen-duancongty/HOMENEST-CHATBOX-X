@@ -48,7 +48,7 @@ router.post("/register-wp-site", async (req, res) => {
       // <-- Đặt name mặc định nếu không gửi
       client = new ClientModel({
         clientId,
-        api_keys: apiKey,
+        key: apiKey,
         domain: cleanDomain,
         user_email: email,
         name: `Client-${clientId}`,  // đây là default name

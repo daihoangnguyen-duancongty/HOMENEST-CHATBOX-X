@@ -62,7 +62,12 @@ static async createClient(req: Request, res: Response) {
     while (await ClientModel.findOne({ clientId: newClientId })) {
       newClientId = nanoid(12);
     }
-
+    // Sinh key riêng cho client
+    const crypto = await import('crypto');
+    let newKey = crypto.randomBytes(16).toString('hex');
+    while (await ClientModel.findOne({ key: newKey })) {
+      newKey = crypto.randomBytes(16).toString('hex');
+    }
     // Parse
     const apiKeys = typeof data.api_keys === "string" ? JSON.parse(data.api_keys) : data.api_keys;
     const meta = typeof data.meta === "string" ? JSON.parse(data.meta) : data.meta;
@@ -75,14 +80,15 @@ static async createClient(req: Request, res: Response) {
     // Tạo client
     const newClient = await ClientModel.create({
       clientId: newClientId,
+       key: newKey, 
       name: data.name,
       domain: data.domain,
       avatar: avatarUrl,
       color: data.color,
       ai_provider: data.ai_provider,
       welcome_message: data.welcome_message,
-      api_keys: apiKeys,
-      meta: meta,
+      api_keys: apiKeys || {},
+      meta: meta || {},
       user_count: userCount,
 
       // GIỮ ĐÚNG THEO SCHEMA — EMBED
