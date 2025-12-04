@@ -47,6 +47,13 @@ pm2 logs chatbot
 
 
 
+--> Khi thay đổi code và đẩy lại trên server:
+
+cd /www/backend
+npx tsc
+pm2 stop backend
+pm2 delete backend
+pm2 start dist/server.js --name backend --update-env
 
 
 
