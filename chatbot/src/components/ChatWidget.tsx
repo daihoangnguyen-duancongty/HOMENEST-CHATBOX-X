@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage, WidgetProps } from '../types';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { FiSend, FiPaperclip, FiSmile, FiSettings, FiX,FiLink } from 'react-icons/fi';
-
+import { BASE_URL } from '../apis/fetcher';
 import { getChatHistory, sendMessageToAI } from '../apis/chatApi';
 
 
@@ -95,7 +95,7 @@ useEffect(scrollToBottom, [messages]);
 
   // Gọi API visitor
   try {
-    const res = await fetch(`${backend}/customer/chat`, {
+    const res = await fetch(`${BASE_URL}/customer/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

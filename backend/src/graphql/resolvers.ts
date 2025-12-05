@@ -1,7 +1,7 @@
 import { ClientModel } from '../models/Client';
 import { UserModel } from '../models/User';
 import jwt from 'jsonwebtoken';
-import Sentry from '../instrument';
+import { Sentry } from "./../instrument"
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 

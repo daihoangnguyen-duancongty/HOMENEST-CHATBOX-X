@@ -1,12 +1,12 @@
 // MUST BE FIRST
-import './instrument';
+// import './instrument';
 
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 
 import bodyParser from 'body-parser';
-import { ApolloServer, HeaderMap } from '@apollo/server';
-import Sentry from './instrument'; // import từ instrument.ts
+// import { ApolloServer, HeaderMap } from '@apollo/server';
+// import { Sentry } from "./instrument"; // import từ instrument.ts
 
 import schema from './graphql/schema';
 import resolvers from './graphql/resolvers';
@@ -26,14 +26,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ----------------- Sentry request middleware -----------------
-app.use((req: Request, res: Response, next: NextFunction) => {
-  Sentry.addBreadcrumb({
-    category: 'request',
-    message: `${req.method} ${req.url}`,
-    level: 'info',
-  });
-  next();
-});
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   Sentry.addBreadcrumb({
+//     category: 'request',
+//     message: `${req.method} ${req.url}`,
+//     level: 'info',
+//   });
+//   next();
+// });
 
 // ----------------- Middleware -----------------
 app.use(express.json());
@@ -74,55 +74,55 @@ app.use('/admin-api/auth', adminAuthRoutes);
 app.use("/api/customer", customerChatRoutes);
 app.use("/public/client", publicClient);
 // ----------------- Apollo Server -----------------
-const startApolloServer = async () => {
-  const server = new ApolloServer({ typeDefs: schema, resolvers });
-  await server.start();
+// const startApolloServer = async () => {
+//   const server = new ApolloServer({ typeDefs: schema, resolvers });
+//   await server.start();
 
-  app.use('/graphql', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // Convert headers sang HeaderMap để Apollo v4 chấp nhận
-      const headers = new HeaderMap();
-      for (const [key, value] of Object.entries(req.headers)) {
-        if (typeof value === 'string') headers.set(key, value);
-        else if (Array.isArray(value)) headers.set(key, value.join(','));
-      }
+//   app.use('/graphql', async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       // Convert headers sang HeaderMap để Apollo v4 chấp nhận
+//       const headers = new HeaderMap();
+//       for (const [key, value] of Object.entries(req.headers)) {
+//         if (typeof value === 'string') headers.set(key, value);
+//         else if (Array.isArray(value)) headers.set(key, value.join(','));
+//       }
 
-      const result = await server.executeHTTPGraphQLRequest({
-        httpGraphQLRequest: {
-          body: req.body,
-          headers,
-          method: req.method,
-          search: req.url?.split('?')[1] ?? '',
-        },
-        context: async () => ({ req, res }),
-      });
+//       const result = await server.executeHTTPGraphQLRequest({
+//         httpGraphQLRequest: {
+//           body: req.body,
+//           headers,
+//           method: req.method,
+//           search: req.url?.split('?')[1] ?? '',
+//         },
+//         context: async () => ({ req, res }),
+//       });
 
-      res.status(result.status || 200).json(result.body);
-    } catch (err) {
-      next(err);
-    }
-  });
-};
+//       res.status(result.status || 200).json(result.body);
+//     } catch (err) {
+//       next(err);
+//     }
+//   });
+// };
 
 // ----------------- Sentry error middleware -----------------
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  Sentry.captureException(err);
-  console.error(err);
-  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
-});
+// app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+//   Sentry.captureException(err);
+//   console.error(err);
+//   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+// });
 
 // ----------------- Start Server -----------------
 const startServer = async () => {
   try {
     await connectDB();
-    await startApolloServer();
+    // await startApolloServer();
 
     // ✅ Seed plans tự động
     await seedPlans();
 
     app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
   } catch (err) {
-    Sentry.captureException(err);
+    // Sentry.captureException(err);
     console.error('❌ Server failed:', err);
   }
 };

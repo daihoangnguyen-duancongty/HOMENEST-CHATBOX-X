@@ -9,4 +9,5 @@ Sentry.init({
   sendDefaultPii: true,
 });
 
-export default Sentry;
+// 👇 Export đúng cách
+export { Sentry };

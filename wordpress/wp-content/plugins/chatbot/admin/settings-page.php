@@ -15,7 +15,7 @@ add_action('init', function () {
     if (!isset($_GET['test_chatbot_ping'])) return;
 
     $response = wp_remote_post(
-        "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
+        "https://api.goquestx.com/public/client/register-wp-site",
         [
             'method' => 'POST',
             'timeout' => 30,
@@ -56,7 +56,7 @@ function chatbotx_render_settings_page() {
                 $siteUrl = get_site_url();
 
                 $response = wp_remote_post(
-    "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
+    "https://api.goquestx.com/public/client/register-wp-site",
     [
         'method'    => 'POST',
         'headers'   => ['Content-Type' => 'application/json'],

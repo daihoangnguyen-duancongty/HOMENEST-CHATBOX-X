@@ -21,7 +21,7 @@ register_activation_hook(__FILE__, function () {
     $adminEmail = get_option('admin_email');
 
     $response = wp_remote_post(
-        "https://homenest-chatbox-x-production.up.railway.app/public/client/register-wp-site",
+        "https://api.goquestx.com/public/client/register-wp-site",
         [
             'method' => 'POST',
             'headers' => ['Content-Type' => 'application/json'],
@@ -54,7 +54,7 @@ add_action('wp_enqueue_scripts', function () {
 
     $clientId = get_option('chatbotx_client_id');
     $apiKey = get_option("chatbotx_api_key");
-    $apiEndpoint = "https://homenest-chatbox-x-production.up.railway.app/api";
+    $apiEndpoint = "https://api.goquestx.com/api";
 
     if (!$clientId) return;
 

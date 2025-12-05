@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import { Sentry } from "../instrument";
 import { Request, Response, NextFunction } from 'express';
 
 // Middleware để log lỗi

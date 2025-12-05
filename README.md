@@ -4,6 +4,14 @@
 
 ================================================================SEVER=====================================================================
 
+
+✅ BƯỚC 1 – KIỂM TRA CÓ LỖI KO KHI BUILD TRÊN LOCAL -> NẾU BUILD KO LỖI THÌ 99% KO LỖI KHI CHẠY SERVER
+
+npm run build
+node dist/server.js
+
+
+
 ✅ BƯỚC 2 – CHẠY 3 APP BẰNG PM2
 PM2 setup đúng cách cho frontend
 
@@ -55,9 +63,21 @@ pm2 stop backend
 pm2 delete backend
 pm2 start dist/server.js --name backend --update-env
 
+hoac
 
+cd /www/backend
+rm -rf dist
+npx tsc
+pm2 restart all
 
+-> test lại có lỗi ko:
 
+pm2 logs backend
+
+-> kiểm tra nhận port chưa
+
+netstat -tulnp | grep 3002
+curl http://127.0.0.1:3002
 
 
 
